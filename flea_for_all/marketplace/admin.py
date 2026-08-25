@@ -1,3 +1,25 @@
 from django.contrib import admin
+from .models import Profile, Product, Report
 
-# Register your models here.
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "city", "province", "is_verified", "created_at")
+    list_filter = ("is_verified", "province")
+    search_fields = ("user__username", "user__email", "city", "province")
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ("title", "seller", "category", "price", "status", "condition", "created_at")
+    list_filter = ("status", "condition", "category")
+    search_fields = ("title", "description", "seller__user__username")
+    list_editable = ("status",)
+
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ("product", "reason", "reporter", "is_resolved", "created_at")
+    list_filter = ("reason", "is_resolved")
+    search_fields = ("product__title",)
+    list_editable = ("is_resolved",)
