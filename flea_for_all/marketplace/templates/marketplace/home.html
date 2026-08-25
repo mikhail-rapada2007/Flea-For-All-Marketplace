@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>Flea For All Marketplace</title></head>
+<body>
+    <h1>Flea For All Marketplace</h1>
+
+    {% if user.is_authenticated %}
+        <p>Logged in as {{ user.username }} | <a href="{% url 'logout' %}">Log out</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in</a> | <a href="{% url 'marketplace:signup' %}">Sign up</a></p>
+    {% endif %}
+
+    <p>Placeholder homepage. Replace with the real Product Listings page.</p>
+    <ul>
+        {% for product in products %}
+            <li>{{ product.title }} - ₱{{ product.price }}</li>
+        {% empty %}
+            <li>No products yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
