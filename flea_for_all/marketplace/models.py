@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Profile(models.Model):
 #User's profile acts as the 'store' page: bio + listings.
@@ -78,8 +79,6 @@ class Report(models.Model):
 
     def __str__(self):
         return f"Report on '{self.product.title}' ({self.get_reason_display()})"
-
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Rating(models.Model):
     class RatingType(models.TextChoices):
