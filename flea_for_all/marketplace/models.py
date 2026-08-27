@@ -79,6 +79,8 @@ class Report(models.Model):
     def __str__(self):
         return f"Report on '{self.product.title}' ({self.get_reason_display()})"
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 class Rating(models.Model):
     class RatingType(models.TextChoices):
         SELLER = "SELLER", "Seller"
@@ -87,7 +89,9 @@ class Rating(models.Model):
     rated_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="ratings_received")
     rated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings_given")
     rating_type = models.CharField(max_length=10, choices=RatingType.choices)
-    score = models.PositiveSmallIntegerField()
+    score = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
