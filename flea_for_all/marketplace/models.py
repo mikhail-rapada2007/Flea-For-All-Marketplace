@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Profile(models.Model):
 #User's profile acts as the 'store' page: bio + listings.
@@ -78,3 +79,36 @@ class Report(models.Model):
 
     def __str__(self):
         return f"Report on '{self.product.title}' ({self.get_reason_display()})"
+
+class Rating(models.Model):
+    class RatingType(models.TextChoices):
+        SELLER = "SELLER", "Seller"
+        BUYER = "BUYER", "Buyer"
+
+    rated_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="ratings_received")
+    rated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings_given")
+    rating_type = models.CharField(max_length=10, choices=RatingType.choices)
+    score = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.get_rating_type_display()} rating for {self.rated_profile.user.username}: {self.score}"
+
+
+class FAQ(models.Model):
+    store = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="faqs")
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"{self.store.user.username}'s FAQ: {self.question[:50]}"

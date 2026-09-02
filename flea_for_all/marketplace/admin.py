@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Product, Report
-
+from .models import Profile, Product, Report, Rating, FAQ
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -23,3 +22,16 @@ class ReportAdmin(admin.ModelAdmin):
     list_filter = ("reason", "is_resolved")
     search_fields = ("product__title",)
     list_editable = ("is_resolved",)
+
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ("rated_profile", "rated_by", "rating_type", "score", "created_at")
+    list_filter = ("rating_type", "score")
+    search_fields = ("rated_profile__user__username", "rated_by__username", "comment")
+
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ("store", "question", "created_at")
+    list_filter = ("store",)
+    search_fields = ("question", "answer", "store__user__username")
