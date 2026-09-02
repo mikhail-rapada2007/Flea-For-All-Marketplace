@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head><title>Flea For All Marketplace</title></head>
-<body>
-    <h1>Flea For All Marketplace</h1>
+{% extends "marketplace/base.html" %}
 
-    {% if user.is_authenticated %}
-        <p>Logged in as {{ user.username }} | <a href="{% url 'logout' %}">Log out</a></p>
-    {% else %}
-        <p><a href="{% url 'login' %}">Log in</a> | <a href="{% url 'marketplace:signup' %}">Sign up</a></p>
-    {% endif %}
+{% block title %}Home - Flea For All Marketplace{% endblock %}
 
+{% block content %}
     <p>Placeholder homepage. Replace with the real Product Listings page.</p>
     <ul>
         {% for product in products %}
@@ -18,5 +11,4 @@
             <li>No products yet.</li>
         {% endfor %}
     </ul>
-</body>
-</html>
+{% endblock %}
