@@ -22,6 +22,8 @@ def signup(request):
         form = SignUpForm()
     return render(request, "marketplace/signup.html", {"form": form})
 
+def terms_view(request):
+    return render(request, "marketplace/terms.html")
 
 def store_listings(request):
     """Lists every seller's store (Profile) as a browsable directory —

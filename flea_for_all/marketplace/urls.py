@@ -7,5 +7,6 @@ app_name = "marketplace"
 urlpatterns = [
     path("", views.home, name="home"),
     path("signup/", views.signup, name="signup"),
+    path("terms/", views.terms_view, name="terms"),
     path("stores/", views.store_listings, name="store_listings"),
 ]
