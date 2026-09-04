@@ -148,7 +148,10 @@
         <div class="collapse navbar-collapse" id="navbarContent">
           <ul class="navbar-nav mx-auto mb-2 mb-md-0">
             <li class="nav-item">
-              <a class="nav-link nav-link-custom active" href="{% url 'marketplace:home' %}">HOME</a>
+              <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'marketplace:home' %}">HOME</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'store_listings' %}active{% endif %}" href="{% url 'marketplace:store_listings' %}">STORES</a>
             </li>
           </ul>
 

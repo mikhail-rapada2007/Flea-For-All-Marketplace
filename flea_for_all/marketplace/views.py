@@ -15,9 +15,16 @@ def signup(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Profile.objects.create(user=user)  # every new account gets a Profile immediately
+            Profile.objects.create(user=user)
             login(request, user)
             return redirect("marketplace:home")
     else:
         form = SignUpForm()
     return render(request, "marketplace/signup.html", {"form": form})
+
+
+def store_listings(request):
+    """Lists every seller's store (Profile) as a browsable directory —
+    this is NOT the detailed view of any single store."""
+    profiles = Profile.objects.all()
+    return render(request, "marketplace/store_listings.html", {"profiles": profiles})

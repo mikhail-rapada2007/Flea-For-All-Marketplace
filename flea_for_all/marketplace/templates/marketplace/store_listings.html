@@ -1,0 +1,31 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+{% block content %}
+  <div class="d-flex justify-content-start mb-4">
+    <span class="section-badge">Stores</span>
+  </div>
+  <section class="row g-4">
+    {% for profile in profiles %}
+      <div class="col-md-6">
+        <a href="#"
+          class="market-card product-box p-4 d-flex flex-column justify-content-end text-decoration-none {% if profile.profile_picture_url %}has-image{% endif %}"
+          {% if profile.profile_picture_url %}style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 40%, rgba(50,39,31,0.92) 100%), url('{{ profile.profile_picture_url }}');"{% endif %}
+        >
+          <div class="fs-4 fw-bold text-white">
+            <span title="StoreName">{{ profile.user.username }}'s Store</span>
+            {% if profile.is_verified %}<span title="Verified">✔</span>{% endif %}
+          </div>
+            {% if profile.city or profile.province %}
+                <div class="fs-6 text-white-50">{{ profile.city }}, {{ profile.province }}</div>
+            {% endif %}
+        </a>
+      </div>
+    {% empty %}
+      <div class="col-md-6">
+        <article class="market-card product-box p-4 d-flex flex-column justify-content-end">
+          <div class="fs-4 fw-bold">No stores yet</div>
+        </article>
+      </div>
+    {% endfor %}
+  </section>
+{% endblock %}
