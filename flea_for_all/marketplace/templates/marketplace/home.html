@@ -1,14 +1,85 @@
-{% extends "marketplace/base.html" %}
-
-{% block title %}Home - Flea For All Marketplace{% endblock %}
+{% extends 'marketplace/base.html' %}
+{% load static %}
 
 {% block content %}
-    <p>Placeholder homepage. Replace with the real Product Listings page.</p>
-    <ul>
-        {% for product in products %}
-            <li>{{ product.title }} - ₱{{ product.price }}</li>
-        {% empty %}
-            <li>No products yet.</li>
-        {% endfor %}
-    </ul>
+  <!-- Top Showcase / Hero -->
+  <section class="row g-3 mb-5">
+    <div class="col-lg-6">
+      <!-- Large Hero Card: add image URL to style attribute whenever backend is ready -->
+      <div 
+        class="market-card hero-main h-100 p-4 d-flex align-items-end {% if featured_item.image %}has-image{% endif %}"
+        {% if featured_item.image %}style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 40%, rgba(50,39,31,0.9) 100%), url('{{ featured_item.image.url }}');"{% endif %}
+      >                 
+        <span>{{ featured_item.title|default:"[Place Holder]" }}</span>
+      </div>
+    </div>
+
+    <!-- 2x3 Thumbnail Grid -->
+    <div class="col-lg-6">
+      <div class="row g-3">
+        {% if showcase_slots %}
+          <!-- Active backend loop when context is provided -->
+          {% for spot in showcase_slots %}
+            <div class="col-4">
+              <div 
+                class="market-card hero-thumb p-3 d-flex align-items-end {% if spot.image %}has-image{% endif %}"
+                {% if spot.image %}style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 30%, rgba(50,39,31,0.85) 100%), url('{{ spot.image.url }}');"{% endif %}
+              >
+              <!-- PLACE HOLDER WHILE CATEGORIES ARE NOT YET DETERMINED -->
+                <span>{{ spot.label|default:"[CATEGORY]" }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <!-- Frontend-ready placeholders (PLACEHOLDERS) -->
+          {% for i in "123456" %}
+            <div class="col-4">
+              <div 
+                class="market-card hero-thumb p-3 d-flex align-items-end"
+                {# To test static images before backend is ready, uncomment below: #}
+                style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 30%, rgba(50,39,31,0.85) 100%), url('/static/images/placeholder{{ forloop.counter }}.jpg');"
+              >
+                <span>[CATEGORY]</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Section Title -->
+  <div class="d-flex justify-content-start mb-4">
+    <span class="section-badge">Products</span>
+  </div>
+
+  <!-- Dynamic Product Grid -->
+  <section class="row g-4">
+    {% for product in products %}
+      <div class="col-md-6">
+        <a 
+          href="{% if product.get_absolute_url %}{{ product.get_absolute_url }}{% else %}#{% endif %}" 
+          class="market-card product-box p-4 d-flex flex-column justify-content-end text-decoration-none {% if product.image %}has-image{% endif %}"
+          {% if product.image %}style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 40%, rgba(50,39,31,0.92) 100%), url('{{ product.image.url }}');"{% endif %}
+        >
+          <div class="fs-4 fw-bold text-white">{{ product.title }}</div>
+          <div class="fs-5 fw-semibold text-white-50">₱{{ product.price|floatformat:2 }}</div>
+        </a>
+      </div>
+    {% empty %}
+    <!-- KAPAG WALANG ITEMS NA NAKIKITA SA BACK END -->
+      <div class="col-md-6">
+        <article class="market-card product-box p-4 d-flex flex-column justify-content-end">
+          <div class="fs-4 fw-bold">Product name</div>
+          <div class="fs-5 fw-semibold text-white-50">₱0.00</div>
+        </article>
+      </div>
+      <div class="col-md-6">
+        <article class="market-card product-box p-4 d-flex flex-column justify-content-end">
+          <div class="fs-4 fw-bold">Product name</div>
+          <div class="fs-5 fw-semibold text-white-50">₱67.00</div>
+        </article>
+      </div>
+    {% endfor %}
+  </section>
 {% endblock %}
