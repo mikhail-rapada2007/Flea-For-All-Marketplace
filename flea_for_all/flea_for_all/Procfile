@@ -1,0 +1,1 @@
+web: gunicorn flea_for_all.wsgi:application
