@@ -191,6 +191,7 @@
           <h4 class="footer-heading mb-3">Quick Links</h4>
           <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
             <li><a href="{% url 'marketplace:home' %}" class="text-white text-decoration-none fw-bold small text-uppercase opacity-75">Home</a></li>
+            <li><a href="{% url 'marketplace:terms' %}" class="text-white text-decoration-none fw-bold small text-uppercase opacity-75">Terms & Services</a></li>
             {% if user.is_authenticated %}
               <li>
                 <form method="post" action="{% url 'logout' %}" class="d-inline m-0 p-0">

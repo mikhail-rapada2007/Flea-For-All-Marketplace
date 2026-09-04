@@ -21,3 +21,6 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, "marketplace/signup.html", {"form": form})
+
+def terms_view(request):
+    return render(request, "marketplace/terms.html")

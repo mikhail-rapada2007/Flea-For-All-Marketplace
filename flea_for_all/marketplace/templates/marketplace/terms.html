@@ -1,0 +1,55 @@
+{% extends 'marketplace/base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-lg p-5 border-0" style="background-color: #fdfbf7; border-radius: 16px;">
+                
+                <div class="text-center mb-5">
+                    <span class="badge px-3 py-2 mb-3 text-uppercase tracking-wider" style="background-color: #43352a; color: #fff; font-size: 0.75rem; letter-spacing: 1px;">Official Guidelines</span>
+                    <h1 class="display-5 fw-bold" style="font-family: var(--font-main); color: #43352a;">Terms & Services</h1>
+                    <p class="text-muted small fst-italic">Last Updated: August 2026</p>
+                    <hr class="w-25 mx-auto mt-3" style="border-top: 2px solid #43352a; opacity: 0.5;">
+                </div>
+
+                <div class="terms-content" style="color: #2c2c2c; font-family: var(--font-default);">
+                    
+                    <div class="mb-4">
+                        <h4 class="fw-bold" style="color: #43352a;"><span class="me-2">📜</span>1. Acceptance of Terms</h4>
+                        <p class="ps-4 text-secondary">By stepping onto the grounds of Flea-For-All, you officially agree to abide by our community ledgers and unwritten codes of fair trade.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="fw-bold" style="color: #43352a;"><span class="me-2">🔑</span>2. User Accounts & Security</h4>
+                        <p class="ps-4 text-secondary">Every registered user is the sole keeper of their digital stall. Keep your password secure to protect your storefront and maintain a trusted reputation within the community.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="fw-bold" style="color: #43352a;"><span class="me-2">🏷️</span>3. Marketplace Code of Conduct</h4>
+                        <p class="ps-4 text-secondary">All goods listed must be safe, legal, and authentic to the spirit of an open-market community. Counterfeits, prohibited items, or malicious listings will face immediate removal and permanent storefront banishment.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="fw-bold" style="color: #43352a;"><span class="me-2">🤝</span>4. Limitation of Liability</h4>
+                        <p class="ps-4 text-secondary">Flea-For-All acts purely as the town square where independent buyers and sellers connect. We do not directly handle item exchanges or monetary transactions, and we hold no liability for independent disputes between users.</p>
+                    </div>
+
+                    <div class="mb-5">
+                        <h4 class="fw-bold" style="color: #43352a;"><span class="me-2">⚙️</span>5. Modifications</h4>
+                        <p class="ps-4 text-secondary">We may update these terms periodically to reflect new features or community safety standards. Continued use of the platform means you welcome these positive adjustments.</p>
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <a href="{% url 'marketplace:home' %}" class="btn px-4 py-2 text-white fw-bold shadow-sm" style="background-color: #43352a; border-radius: 8px; transition: all 0.2s;">
+                        ← Return to Marketplace
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
