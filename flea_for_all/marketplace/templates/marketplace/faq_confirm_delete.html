@@ -1,0 +1,11 @@
+{% extends 'marketplace/base.html' %}
+{% block content %}
+  <h2 class="mb-4">Delete this FAQ?</h2>
+  <p><strong>{{ faq.question }}</strong></p>
+  <p>{{ faq.answer }}</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, delete</button>
+    <a href="{% url 'marketplace:store_detail' faq.store.pk %}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'marketplace/base.html' %}
+{% block content %}
+  <h2 class="mb-4">Messages</h2>
+  {% for convo in conversations %}
+    <a href="{% url 'marketplace:conversation_detail' convo.pk %}" class="market-card p-3 mb-3 d-block text-decoration-none text-white">
+      Conversation from {{ convo.created_at|date:"M d, Y" }}
+    </a>
+  {% empty %}
+    <p>No conversations yet.</p>
+  {% endfor %}
+{% endblock %}
