@@ -1,0 +1,36 @@
+<div id="chatWidgetsContainer" class="chat-widgets-container">
+  {% for conversation in open_conversations %}
+    <div class="chat-widget" data-conversation-id="{{ conversation.pk }}">
+      <div class="chat-widget-header d-flex justify-content-between align-items-center p-2 bg-market-brown text-white">
+        <div class="d-flex align-items-center gap-2">
+          {% if conversation.other_user.profile.profile_picture_url %}
+            <img src="{{ conversation.other_user.profile.profile_picture_url }}" class="chat-avatar" alt="">
+          {% else %}
+            <div class="chat-avatar chat-avatar-placeholder"></div>
+          {% endif %}
+          <span class="fw-bold">{{ conversation.other_user.profile.store_name|default:conversation.other_user.username }}</span>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-light me-1 chat-minimize-btn">_</button>
+          <a href="{% url 'marketplace:close_chat' conversation.pk %}" class="btn btn-sm btn-outline-light">✕</a>
+        </div>
+      </div>
+      <div class="chat-widget-body">
+        <div class="chat-widget-messages p-2">
+          {% for message in conversation.messages.all %}
+            <div class="mb-2 {% if message.sender == request.user %}text-end{% endif %}">
+              <strong>{{ message.sender.username }}:</strong> {{ message.content }}
+            </div>
+          {% endfor %}
+        </div>
+        <form method="post" action="{% url 'marketplace:send_widget_message' conversation.pk %}" class="chat-widget-form p-2">
+          {% csrf_token %}
+          <div class="input-group">
+            <input type="text" name="content" class="form-control" placeholder="Type a message..." required>
+            <button type="submit" class="btn btn-primary">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+</div>

@@ -1,0 +1,19 @@
+{% extends 'marketplace/base.html' %}
+{% block content %}
+  <h2 class="mb-4">Conversation</h2>
+  <div class="mb-4">
+    {% for message in conversation.messages.all %}
+      <div class="market-card p-2 mb-2 {% if message.sender == request.user %}text-end{% endif %}">
+        <strong>{{ message.sender.username }}:</strong> {{ message.content }}
+        <div class="small text-white-50">{{ message.sent_at|date:"M d, g:i A" }}</div>
+      </div>
+    {% endfor %}
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="input-group">
+      <input type="text" name="content" class="form-control" placeholder="Type a message..." required>
+      <button type="submit" class="btn btn-primary">Send</button>
+    </div>
+  </form>
+{% endblock %}

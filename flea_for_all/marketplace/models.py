@@ -11,6 +11,16 @@ class Profile(models.Model):
     city = models.CharField(max_length=100, blank=True)
     province = models.CharField(max_length=100, blank=True)
     is_verified = models.BooleanField(default=False)
+    store_name = models.CharField(max_length=100, blank=True)
+    theme_background_url = models.URLField(blank=True)
+    theme_color = models.CharField(max_length=7, blank=True, help_text="Hex color, e.g. #524336")
+
+    class ThemeFont(models.TextChoices):
+        DEFAULT = "DEFAULT", "Default"
+        MONTSERRAT = "MONTSERRAT", "Montserrat"
+        SHRIKHAND = "SHRIKHAND", "Shrikhand"
+
+    theme_font = models.CharField(max_length=20, choices=ThemeFont.choices, default=ThemeFont.DEFAULT)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -112,3 +122,21 @@ class FAQ(models.Model):
 
     def __str__(self):
         return f"{self.store.user.username}'s FAQ: {self.question[:50]}"
+
+class Conversation(models.Model):
+    participants = models.ManyToManyField(User, related_name="conversations")
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name="conversations")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class Message(models.Model):
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages_sent")
+    content = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["sent_at"]
