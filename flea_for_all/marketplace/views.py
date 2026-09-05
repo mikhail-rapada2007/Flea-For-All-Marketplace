@@ -174,3 +174,8 @@ def store_detail(request, pk):
         "seller_avg": seller_avg,
         "rating_form": rating_form, 
     })
+
+def product_detail(request, pk):
+    """Shows one product's detailed page."""
+    product = get_object_or_404(Product, pk=pk)
+    return render(request, "marketplace/product_detail.html", {"product": product})

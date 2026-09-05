@@ -20,4 +20,5 @@ urlpatterns = [
     path("faq/<int:pk>/edit/", views.edit_faq, name="edit_faq"),
     path("faq/<int:pk>/delete/", views.delete_faq, name="delete_faq"),
     path("stores/<int:pk>/review/add/", views.add_review, name="add_review"),
+    path("product/<int:pk>/", views.product_detail, name="product_detail"),
 ]

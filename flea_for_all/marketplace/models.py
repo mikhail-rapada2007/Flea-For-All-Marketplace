@@ -63,6 +63,10 @@ class Product(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("marketplace:product_detail", kwargs={"pk": self.id})
+
     def __str__(self):
         return f"{self.title} ({self.get_status_display()})"
 
