@@ -1,0 +1,11 @@
+{% extends 'marketplace/base.html' %}
+{% block content %}
+<div class="market-card p-4">
+    <h2 class="text-white mb-4">Store Review</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+{% endblock %}
