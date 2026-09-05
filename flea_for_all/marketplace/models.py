@@ -7,12 +7,12 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
-    profile_picture_url = models.URLField(blank=True)
+    profile_picture = models.ImageField(upload_to="profiles/avatars/", blank=True, null=True)
     city = models.CharField(max_length=100, blank=True)
     province = models.CharField(max_length=100, blank=True)
     is_verified = models.BooleanField(default=False)
     store_name = models.CharField(max_length=100, blank=True)
-    theme_background_url = models.URLField(blank=True)
+    theme_background = models.ImageField(upload_to="profiles/backgrounds/", blank=True, null=True)
     theme_color = models.CharField(max_length=7, blank=True, help_text="Hex color, e.g. #524336")
 
     class ThemeFont(models.TextChoices):
@@ -54,7 +54,7 @@ class Product(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image_url = models.URLField(blank=True)
+    image = models.ImageField(upload_to="products/%Y/%m/", blank=True, null=True)
     condition = models.CharField(max_length=10, choices=Condition.choices, default=Condition.GOOD)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.AVAILABLE)
     created_at = models.DateTimeField(auto_now_add=True)

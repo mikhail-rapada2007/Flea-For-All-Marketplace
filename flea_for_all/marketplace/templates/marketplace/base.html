@@ -64,17 +64,17 @@
 
     /* Card image container setup */
     .market-card {
-    background-color: var(--card-brown) ;  /* Default fallback if image is missing/loading */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 20px;
-    color: #fff;
-    border: none;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    text-decoration: none;
+      background-color: var(--card-brown) ;  /* Default fallback if image is missing/loading */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 20px;
+      color: #fff;
+      border: none;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
     }
 
     /* Subtle dark gradient overlay so white text remains readable over bright photos */
@@ -129,8 +129,78 @@
         font-size: 1.1rem;
         font-weight: 800;
         letter-spacing: 0.5px;
+
     }
-    </style>
+    /* NEW BUTTON FOR BACK Styles */ 
+
+    .btn-back {
+        --btn-bg: var(--card-brown, #524336);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        position: relative;
+        padding: 0.75rem 1.6rem;
+        color: #fff !important;
+        text-decoration: none !important;
+        background-color: var(--btn-bg);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(82, 67, 54, 0.25);
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Diagonal metallic light-sweep */
+    .btn-back::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -100%;
+        width: 60%;
+        height: 200%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.28),
+            transparent
+        );
+        transform: rotate(25deg);
+        transition: left 0.6s ease;
+    }
+
+    .btn-back:hover::before {
+        left: 140%;
+    }
+
+    /* Tactile 3D Hover & Elevation */
+    .btn-back:hover {
+        transform: translateY(-3px) scale(1.02);
+        text-decoration: none !important;
+        box-shadow: 0 10px 24px rgba(82, 67, 54, 0.4),
+                    0 0 0 3px rgba(82, 67, 54, 0.15);
+    }
+
+    .btn-back:active {
+        transform: translateY(-1px) scale(0.99);
+        box-shadow: 0 3px 8px rgba(82, 67, 54, 0.3);
+    }
+
+    /* Interactive spring arrow animation */
+    .btn-back .arrow {
+        display: inline-block;
+        font-size: 1.15rem;
+        line-height: 1;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .btn-back:hover .arrow {
+        transform: translateX(-6px);
+    }
+</style>
 {% block extra_css %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -153,6 +223,15 @@
             <li class="nav-item">
               <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'store_listings' %}active{% endif %}" href="{% url 'marketplace:store_listings' %}">STORES</a>
             </li>
+            <li class="nav-item">
+            {% if user.is_authenticated and user.profile %}
+              <li class="nav-item">
+                <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'store_detail' %}active{% endif %}" 
+                  href="{% url 'marketplace:store_detail' user.profile.pk %}">MY STORE</a>
+              </li>
+            {% endif %}
+            </li>
+
           </ul>
 
           <div class="d-flex align-items-center gap-4">
