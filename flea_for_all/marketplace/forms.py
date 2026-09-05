@@ -15,9 +15,9 @@ class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            "store_name", "bio", "profile_picture_url",
+            "store_name", "bio", "profile_picture",
             "city", "province",
-            "theme_background_url", "theme_color", "theme_font",
+            'theme_background',
         ]
 
 class FAQForm(forms.ModelForm):
