@@ -24,3 +24,16 @@ class FAQForm(forms.ModelForm):
     class Meta:
         model = FAQ
         fields = ["question", "answer"]
+
+class RatingForm(forms.ModelForm):
+    score = forms.ChoiceField(
+        choices=[(i, f"{i}" + ("" if i > 1 else "")) for i in range(5, 0, -1)],
+        widget=forms.RadioSelect(attrs={'class': 'rating-stars-input'})
+    )
+
+    class Meta:
+        model = Rating
+        fields = ['score', 'comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        }

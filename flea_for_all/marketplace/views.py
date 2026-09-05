@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.db.models import Avg
-from .forms import SignUpForm, ProfileEditForm, FAQForm
+from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm
 from .models import Profile, Product, Rating, FAQ, Conversation, Message
 from django.contrib.auth.decorators import login_required
 
@@ -114,6 +114,28 @@ def home(request):
     return render(request, "marketplace/home.html", {"products": products})
 
 
+@login_required
+def add_review(request, pk):
+    store_profile = get_object_or_404(Profile, pk=pk)
+    
+    if store_profile.user == request.user:
+        return redirect("marketplace:store_detail", pk=pk)
+
+    if request.method == "POST":
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.rated_profile = store_profile
+            review.rated_by = request.user
+            review.rating_type = Rating.RatingType.SELLER
+            review.save()
+            return redirect("marketplace:store_detail", pk=pk)
+    else:
+        form = RatingForm()
+        
+    return render(request, "marketplace/review_form.html", {"form": form, "store": store_profile})
+
+
 def signup(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
@@ -140,12 +162,15 @@ def store_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
     products = profile.products.filter(status=Product.Status.AVAILABLE)
     faqs = profile.faqs.all()
-    seller_avg = profile.ratings_received.filter(
-        rating_type=Rating.RatingType.SELLER
-    ).aggregate(Avg("score"))["score__avg"]
+    reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
+    seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
+    rating_form = RatingForm()
 
     return render(request, "marketplace/store_detail.html", {
         "profile": profile,
         "products": products,
         "faqs": faqs,
-        "seller_avg": seller_avg,})
+        "reviews": reviews,         
+        "seller_avg": seller_avg,
+        "rating_form": rating_form, 
+    })
