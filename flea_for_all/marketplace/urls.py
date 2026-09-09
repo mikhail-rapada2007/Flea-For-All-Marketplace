@@ -26,5 +26,5 @@ urlpatterns = [
     path("profile/edit/", views.edit_profile, name="edit_profile"),
     path("products/<int:pk>/report/", views.add_report, name="add_report"),
     path("stores/<int:pk>/report/", views.add_store_report, name="add_store_report"),
-
+    path("products/<int:pk>/status/", views.update_product_status, name="update_product_status"),
     ]

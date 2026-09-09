@@ -207,7 +207,7 @@ def add_product(request):
 
 def store_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
-    products = profile.products.filter(status=Product.Status.AVAILABLE)
+    products = profile.products.filter(status__in=[Product.Status.AVAILABLE, Product.Status.RESERVED])
     faqs = profile.faqs.all()
     reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
     seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
@@ -226,7 +226,7 @@ def store_detail(request, pk):
 
 def store_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
-    products = profile.products.filter(status=Product.Status.AVAILABLE)
+    products = profile.products.filter(status__in=[Product.Status.AVAILABLE, Product.Status.RESERVED])
     faqs = profile.faqs.all()
     reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
     seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
@@ -287,3 +287,13 @@ def add_store_report(request, pk):
         )
         return redirect("marketplace:store_detail", pk=store.pk)
     return redirect("marketplace:store_detail", pk=store.pk)
+
+@login_required
+def update_product_status(request, pk):
+    product = get_object_or_404(Product, pk=pk, seller=request.user.profile)
+    if request.method == "POST":
+        status = request.POST.get("status")
+        if status in dict(Product.Status.choices):
+            product.status = status
+            product.save()
+    return redirect("marketplace:product_detail", pk=product.pk)
