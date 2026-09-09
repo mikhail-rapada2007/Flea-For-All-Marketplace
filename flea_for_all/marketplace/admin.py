@@ -18,10 +18,19 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ("product", "reason", "reporter", "is_resolved", "created_at")
+    list_display = ("get_target", "reason", "reporter", "is_resolved", "created_at")
     list_filter = ("reason", "is_resolved")
-    search_fields = ("product__title",)
+    search_fields = ("product__title", "store__user__username")
     list_editable = ("is_resolved",)
+
+    def get_target(self, obj):
+        if obj.product:
+            return f"Product: {obj.product.title}"
+        elif obj.store:
+            return f"Store: {obj.store.user.username}"
+        return "-"
+    get_target.short_description = "Target"
+
 
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):

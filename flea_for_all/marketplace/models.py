@@ -72,8 +72,6 @@ class Product(models.Model):
 
 
 class Report(models.Model):
-#Reports are tied to a Product's auto-generated ID.
-
     class Reason(models.TextChoices):
         FAKE_LISTING = "FAKE", "Fake listing"
         SCAM = "SCAM", "Scam"
@@ -81,7 +79,8 @@ class Report(models.Model):
         DUPLICATE = "DUPLICATE", "Duplicate listing"
         OTHER = "OTHER", "Other"
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reports")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reports", null=True, blank=True)
+    store = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="store_reports", null=True, blank=True)
     reporter = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="reports_filed")
     reason = models.CharField(max_length=20, choices=Reason.choices)
     details = models.TextField(blank=True)
@@ -92,7 +91,12 @@ class Report(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Report on '{self.product.title}' ({self.get_reason_display()})"
+        if self.product:
+            return f"Report on Product '{self.product.title}' ({self.get_reason_display()})"
+        elif self.store:
+            return f"Store Report on '{self.store.user.username}' ({self.get_reason_display()})"
+        return f"General Report ({self.get_reason_display()})"
+
 
 class Rating(models.Model):
     class RatingType(models.TextChoices):
@@ -145,3 +149,5 @@ class Message(models.Model):
     class Meta:
         ordering = ["sent_at"]
 
+    def __str__(self):
+        return f"Message from {self.sender.username} at {self.sent_at}"

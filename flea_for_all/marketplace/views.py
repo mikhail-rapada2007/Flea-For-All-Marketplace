@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.db.models import Avg
 from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm
-from .models import Profile, Product, Rating, FAQ, Conversation, Message
+from .models import Profile, Product, Rating, FAQ, Conversation, Message, Report
 from django.contrib.auth.decorators import login_required
 
 @login_required
@@ -207,7 +207,7 @@ def add_product(request):
 
 def store_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
-    products = profile.products.filter(status=Product.Status.AVAILABLE)
+    products = profile.products.filter(status__in=[Product.Status.AVAILABLE, Product.Status.RESERVED])
     faqs = profile.faqs.all()
     reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
     seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
@@ -226,7 +226,7 @@ def store_detail(request, pk):
 
 def store_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
-    products = profile.products.filter(status=Product.Status.AVAILABLE)
+    products = profile.products.filter(status__in=[Product.Status.AVAILABLE, Product.Status.RESERVED])
     faqs = profile.faqs.all()
     reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
     seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
@@ -240,6 +240,7 @@ def store_detail(request, pk):
         "rating_form": RatingForm(),
         "product_form": ProductForm(),
         "profile_form": ProfileEditForm(instance=profile),  
+        "Report": Report,
     })
 
 @login_required
@@ -256,3 +257,43 @@ def edit_profile(request):
     else:
         form = ProfileEditForm(instance=profile)
     return redirect("marketplace:store_detail", pk=profile.pk)
+
+@login_required
+def add_report(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == "POST":
+        reason = request.POST.get("reason")
+        details = request.POST.get("details", "")
+        Report.objects.create(
+            product=product,
+            reporter=request.user,
+            reason=reason,
+            details=details
+        )
+        return redirect("marketplace:product_detail", pk=product.pk)
+    return redirect("marketplace:product_detail", pk=product.pk)
+
+@login_required
+def add_store_report(request, pk):
+    store = get_object_or_404(Profile, pk=pk)
+    if request.method == "POST":
+        reason = request.POST.get("reason")
+        details = request.POST.get("details")
+        Report.objects.create(
+            store=store,
+            reporter=request.user,
+            reason=reason,
+            details=details
+        )
+        return redirect("marketplace:store_detail", pk=store.pk)
+    return redirect("marketplace:store_detail", pk=store.pk)
+
+@login_required
+def update_product_status(request, pk):
+    product = get_object_or_404(Product, pk=pk, seller=request.user.profile)
+    if request.method == "POST":
+        status = request.POST.get("status")
+        if status in dict(Product.Status.choices):
+            product.status = status
+            product.save()
+    return redirect("marketplace:product_detail", pk=product.pk)
