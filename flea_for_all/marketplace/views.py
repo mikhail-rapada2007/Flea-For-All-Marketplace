@@ -108,10 +108,16 @@ def delete_faq(request, pk):
     return render(request, "marketplace/faq_confirm_delete.html", {"faq": faq})
 
 def home(request):
-#THIS IS  A PLACEHOLDER HOMEPAGE — it lists available products. Replace or expand this part as views get built out.
+    category_filter = request.GET.get("category")
     products = Product.objects.filter(status=Product.Status.AVAILABLE)
-    return render(request, "marketplace/home.html", {"products": products})
-
+    if category_filter:
+        products = products.filter(category=category_filter)
+    
+    return render(request, "marketplace/home.html", {
+        "products": products,
+        "selected_category": category_filter,
+        "categories": Product.Category.choices,
+    })
 
 @login_required
 def add_review(request, pk):
@@ -179,6 +185,15 @@ def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     return render(request, "marketplace/product_detail.html", {"product": product})
 
+def category_detail(request, category_slug):
+    products = Product.objects.filter(status=Product.Status.AVAILABLE, category=category_slug)
+    return render(request, "marketplace/category_detail.html", {
+        "products": products,
+        "selected_category": category_slug,
+        "categories": Product.Category.choices,
+    })
+
+  
 @login_required
 def add_product(request):
     if request.method == 'POST':

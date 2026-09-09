@@ -17,33 +17,16 @@
     <!-- 2x3 Thumbnail Grid -->
     <div class="col-lg-6">
       <div class="row g-3">
-        {% if showcase_slots %}
-          <!-- Active backend loop when context is provided -->
-          {% for spot in showcase_slots %}
+        {% for cat_code, cat_name in categories %}
             <div class="col-4">
-              <div 
-                class="market-card hero-thumb p-3 d-flex align-items-end {% if spot.image %}has-image{% endif %}"
-                {% if spot.image %}style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 30%, rgba(50,39,31,0.85) 100%), url('{{ spot.image.url }}');"{% endif %}
-              >
-              <!-- PLACE HOLDER WHILE CATEGORIES ARE NOT YET DETERMINED -->
-                <span>{{ spot.label|default:"[CATEGORY]" }}</span>
-              </div>
+                <a href="{% url 'marketplace:category_detail' cat_code %}" class="text-decoration-none">
+                    <div class="market-card hero-thumb p-3 d-flex align-items-end"
+                         style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 30%, rgba(50,39,31,0.85) 100%), url('/static/images/placeholder{{ forloop.counter }}.jpg');">
+                        <span>{{ cat_name }}</span>
+                    </div>
+                </a>
             </div>
-          {% endfor %}
-        {% else %}
-          <!-- Frontend-ready placeholders (PLACEHOLDERS) -->
-          {% for i in "123456" %}
-            <div class="col-4">
-              <div 
-                class="market-card hero-thumb p-3 d-flex align-items-end"
-                {# To test static images before backend is ready, uncomment below: #}
-                style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 30%, rgba(50,39,31,0.85) 100%), url('/static/images/placeholder{{ forloop.counter }}.jpg');"
-              >
-                <span>[CATEGORY]</span>
-              </div>
-            </div>
-          {% endfor %}
-        {% endif %}
+        {% endfor %}
       </div>
     </div>
   </section>
