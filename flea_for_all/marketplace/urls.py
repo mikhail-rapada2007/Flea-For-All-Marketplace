@@ -19,9 +19,12 @@ urlpatterns = [
     path("faq/add/", views.add_faq, name="add_faq"),
     path("faq/<int:pk>/edit/", views.edit_faq, name="edit_faq"),
     path("faq/<int:pk>/delete/", views.delete_faq, name="delete_faq"),
-    path("stores/<int:pk>/review/add/", views.add_review, name="add_review"),
+    path("stores/<int:pk>/reviesw/add/", views.add_review, name="add_review"),
     path("product/<int:pk>/", views.product_detail, name="product_detail"),
     path('category/<str:category_slug>/', views.category_detail, name='category_detail'),
     path("product/add/", views.add_product, name="add_product"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
+    path("products/<int:pk>/report/", views.add_report, name="add_report"),
+    path("stores/<int:pk>/report/", views.add_store_report, name="add_store_report"),
+
     ]

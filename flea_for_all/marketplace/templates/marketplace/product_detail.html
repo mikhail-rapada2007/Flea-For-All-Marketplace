@@ -55,4 +55,41 @@
         </div>
     </div>
 </div>
+
+<!-- Report Product Button -->
+{% if user.is_authenticated %}
+  <button type="button" class="btn btn-outline-danger mt-3" data-bs-toggle="modal" data-bs-target="#reportModal">
+    Report Product
+  </button>
+{% endif %}
+
+<!-- Report Product Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel">Report Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{% url 'marketplace:add_report' product.pk %}" method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <label class="form-label">Reason</label>
+          <select name="reason" class="form-control">
+            <option value="FAKE">Fake listing</option>
+            <option value="SCAM">Scam</option>
+            <option value="OFFENSIVE">Offensive content</option>
+            <option value="DUPLICATE">Duplicate listing</option>
+            <option value="OTHER">Other</option>
+          </select>
+          <label class="form-label mt-2">Details (optional)</label>
+          <textarea name="details" class="form-control"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
