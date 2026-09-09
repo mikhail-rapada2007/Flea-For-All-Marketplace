@@ -1,31 +1,63 @@
 {% extends 'marketplace/base.html' %}
 {% load static %}
 {% block content %}
+
   <div class="d-flex justify-content-start mb-4">
     <span class="section-badge">Stores</span>
   </div>
+
   <section class="row g-4">
     {% for profile in profiles %}
       <div class="col-md-6">
         <a href="{% url 'marketplace:store_detail' profile.pk %}"
-          class="market-card product-box p-4 d-flex flex-column justify-content-end text-decoration-none {% if profile.profile_picture_url %}has-image{% endif %}"
-          {% if profile.profile_picture_url %}style="background-image: linear-gradient(180deg, rgba(82,67,54,0.1) 40%, rgba(50,39,31,0.92) 100%), url('{{ profile.profile_picture_url }}');"{% endif %}
-        >
-          <div class="fs-4 fw-bold text-white">
-            <span title="StoreName">{{ profile.user.username }}'s Store</span>
-            {% if profile.is_verified %}<span title="Verified">✔</span>{% endif %}
-          </div>
-            {% if profile.city or profile.province %}
-                <div class="fs-6 text-white-50">{{ profile.city }}, {{ profile.province }}</div>
+           class="market-card product-box p-4 d-flex flex-column justify-content-end text-decoration-none {% if profile.theme_background %}has-image{% endif %}"
+           style="background-color: {{ profile.theme_color|default:'var(--card-brown, #524336)' }};
+                  {% if profile.theme_background %}background-image: linear-gradient(180deg, rgba(82,67,54,0.3) 20%, rgba(50,39,31,0.92) 100%), url('{{ profile.theme_background.url }}'); background-size: cover; background-position: center;{% endif %}
+                  min-height: 220px; border-radius: 16px;">
+          
+          <div class="d-flex align-items-center gap-3">
+            <!-- Squircle Avatar -->
+            {% if profile.profile_picture %}
+              <img src="{{ profile.profile_picture.url }}" 
+                   alt="{{ profile.store_name|default:profile.user.username }}" 
+                   class="flex-shrink-0 object-fit-cover shadow-sm"
+                   style="width: 72px; height: 72px; border-radius: 20px; border: 2.5px solid rgba(255, 255, 255, 0.3);">
+            {% else %}
+              <!-- Fallback Initial matching Store Theme Color -->
+              <div class="flex-shrink-0 d-flex align-items-center justify-content-center fw-bold text-white shadow-sm user-select-none"
+                   style="width: 72px; height: 72px; border-radius: 20px; background-color: {{ profile.theme_color|default:'#524336' }}; border: 2.5px solid rgba(255, 255, 255, 0.3); font-size: 1.7rem; box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.18);">
+                {{ profile.store_name|default:profile.user.username|make_list|first|upper }}
+              </div>
             {% endif %}
+
+            <!-- Store Details -->
+            <div>
+              <div class="fs-4 fw-bold text-white d-flex align-items-center gap-2">
+                <span>{{ profile.store_name|default:profile.user.username }}</span>
+                {% if profile.is_verified or user.is_authenticated and user == profile.user %}
+                  <span title="{% if user == profile.user %}Your Store{% else %}Verified{% endif %}" 
+                        class="badge rounded-circle d-inline-flex align-items-center justify-content-center p-0" 
+                        style="width: 22px; height: 22px; background-color: #22c55e; color: #fff; font-size: 0.75rem;">✔</span>
+                {% endif %}
+              </div>
+
+              {% if profile.city or profile.province %}
+                <div class="fs-6 text-white-50">
+                  {{ profile.city }}{% if profile.city and profile.province %}, {% endif %}{{ profile.province }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
         </a>
       </div>
     {% empty %}
-      <div class="col-md-6">
-        <article class="market-card product-box p-4 d-flex flex-column justify-content-end">
-          <div class="fs-4 fw-bold">No stores yet</div>
+      <div class="col-12">
+        <article class="market-card product-box p-4 text-center">
+          <div class="fs-4 fw-bold text-white-50">No stores yet</div>
         </article>
       </div>
     {% endfor %}
   </section>
+
 {% endblock %}

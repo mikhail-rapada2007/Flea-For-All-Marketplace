@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.db.models import Avg
-from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm
+from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm
 from .models import Profile, Product, Rating, FAQ, Conversation, Message
 from django.contrib.auth.decorators import login_required
-
 
 @login_required
 def edit_profile(request):
@@ -193,3 +192,66 @@ def category_detail(request, category_slug):
         "selected_category": category_slug,
         "categories": Product.Category.choices,
     })
+  
+@login_required
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.seller = request.user.profile
+            product.save()
+            return redirect('marketplace:store_detail', pk=request.user.profile.pk)
+    return redirect('marketplace:store_detail', pk=request.user.profile.pk)
+
+def store_detail(request, pk):
+    profile = get_object_or_404(Profile, pk=pk)
+    products = profile.products.filter(status=Product.Status.AVAILABLE)
+    faqs = profile.faqs.all()
+    reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
+    seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
+    rating_form = RatingForm()
+    product_form = ProductForm()  # <-- Pass product_form for the modal overlay
+
+    return render(request, "marketplace/store_detail.html", {
+        "profile": profile,
+        "products": products,
+        "faqs": faqs,
+        "reviews": reviews,         
+        "seller_avg": seller_avg,
+        "rating_form": rating_form,
+        "product_form": product_form,
+    })
+
+def store_detail(request, pk):
+    profile = get_object_or_404(Profile, pk=pk)
+    products = profile.products.filter(status=Product.Status.AVAILABLE)
+    faqs = profile.faqs.all()
+    reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
+    seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
+
+    return render(request, "marketplace/store_detail.html", {
+        "profile": profile,
+        "products": products,
+        "faqs": faqs,
+        "reviews": reviews,         
+        "seller_avg": seller_avg,
+        "rating_form": RatingForm(),
+        "product_form": ProductForm(),
+        "profile_form": ProfileEditForm(instance=profile),  
+    })
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+    if request.method == "POST":
+        form = ProfileEditForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect("marketplace:store_detail", pk=profile.pk)
+        else:
+            print("Profile Edit Errors:", form.errors)  
+            return redirect("marketplace:store_detail", pk=profile.pk)
+    else:
+        form = ProfileEditForm(instance=profile)
+    return redirect("marketplace:store_detail", pk=profile.pk)
