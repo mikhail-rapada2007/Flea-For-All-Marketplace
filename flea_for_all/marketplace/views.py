@@ -193,6 +193,7 @@ def category_detail(request, category_slug):
         "categories": Product.Category.choices,
     })
 
+  
 @login_required
 def add_product(request):
     if request.method == 'POST':
