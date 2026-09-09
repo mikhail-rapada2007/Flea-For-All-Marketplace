@@ -57,7 +57,7 @@
     <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation();">
       {% if request.user.is_authenticated and request.user != profile.user %}
         <a href="{% url 'marketplace:start_conversation' profile.pk %}" class="btn btn-primary">Message Seller</a>
-      {% endif %}
+      {% endif %} 
 
       {% if user.is_authenticated and user == profile.user %}
         <button type="button" class="btn-pill-action btn-sell border-0" data-bs-toggle="modal" data-bs-target="#sellModal">
@@ -81,6 +81,12 @@
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews</button>
   </li>
+  <li class="nav-item ms-auto" role="presentation">
+  <button class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#storeReportModal">
+    Report
+  </button>
+</li>
+
 </ul>
 
 <div class="tab-content" id="storeTabsContent">
@@ -145,6 +151,35 @@
     {% endfor %}
   </div>
 </div>
+
+<!-- Store Report Modal -->
+<div class="modal fade" id="storeReportModal" tabindex="-1" aria-labelledby="storeReportModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="storeReportModalLabel">Report Store</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{% url 'marketplace:add_store_report' profile.pk %}" method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <label class="form-label">Reason</label>
+          <select name="reason" class="form-select">
+            {% for value, label in Report.Reason.choices %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <label class="form-label mt-3">Details</label>
+          <textarea name="details" class="form-control"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <!-- Sell Modal Overlay -->
 {% if user.is_authenticated and user == profile.user %}
