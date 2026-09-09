@@ -22,4 +22,6 @@ urlpatterns = [
     path("stores/<int:pk>/review/add/", views.add_review, name="add_review"),
     path("product/<int:pk>/", views.product_detail, name="product_detail"),
     path('category/<str:category_slug>/', views.category_detail, name='category_detail'),
-]
+    path("product/add/", views.add_product, name="add_product"),
+    path("profile/edit/", views.edit_profile, name="edit_profile"),
+    ]

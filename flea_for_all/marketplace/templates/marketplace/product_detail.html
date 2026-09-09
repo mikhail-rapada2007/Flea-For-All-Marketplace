@@ -38,7 +38,7 @@
 
         {% if user.is_authenticated %}
             {% if user != product.seller.user %}
-                 <a href="{% url 'marketplace:start_conversation' product.seller.pk %}" class="btn btn-primary">Message Seller</a>
+                 <a href="{% url 'marketplace:start_conversation' product.seller.pk %}" class="btn-pill-action btn-back">Message Seller</a>
             {% else %}
                 <p class="text-muted">This is your own listing.</p>
             {% endif %}
@@ -47,7 +47,7 @@
         {% endif %}
 
         <div class="mt-4">
-            <a href="{% url 'marketplace:home' %}" 
+            <a href="{% url 'marketplace:home' %}" class="btn-pill-action btn-back" 
             class="btn-back d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium shadow-sm" 
             >
                 <span aria-hidden="true">&larr;</span> Back to all listings
