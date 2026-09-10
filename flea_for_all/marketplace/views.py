@@ -5,6 +5,18 @@ from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm
 from .models import Profile, Product, Rating, FAQ, Conversation, Message
 from django.contrib.auth.decorators import login_required
 
+def home(request):
+    category_filter = request.GET.get("category")
+    products = Product.objects.all()
+    if category_filter:
+        products = products.filter(category=category_filter)
+    
+    return render(request, "marketplace/home.html", {
+        "products": products,
+        "selected_category": category_filter,
+        "categories": Product.Category.choices,
+    })
+
 @login_required
 def edit_profile(request):
     profile = request.user.profile
@@ -107,18 +119,6 @@ def delete_faq(request, pk):
         return redirect("marketplace:store_detail", pk=request.user.profile.pk)
     return render(request, "marketplace/faq_confirm_delete.html", {"faq": faq})
 
-def home(request):
-    category_filter = request.GET.get("category")
-    products = Product.objects.filter(status=Product.Status.AVAILABLE)
-    if category_filter:
-        products = products.filter(category=category_filter)
-    
-    return render(request, "marketplace/home.html", {
-        "products": products,
-        "selected_category": category_filter,
-        "categories": Product.Category.choices,
-    })
-
 @login_required
 def add_review(request, pk):
     store_profile = get_object_or_404(Profile, pk=pk)
@@ -162,24 +162,6 @@ def store_listings(request):
     profiles = Profile.objects.all()
     return render(request, "marketplace/store_listings.html", {"profiles": profiles})
 
-def store_detail(request, pk):
-    """Shows one seller's detailed store page: profile header + Listings/FAQ/Reviews tabs."""
-    profile = get_object_or_404(Profile, pk=pk)
-    products = profile.products.filter(status=Product.Status.AVAILABLE)
-    faqs = profile.faqs.all()
-    reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
-    seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
-    rating_form = RatingForm()
-
-    return render(request, "marketplace/store_detail.html", {
-        "profile": profile,
-        "products": products,
-        "faqs": faqs,
-        "reviews": reviews,         
-        "seller_avg": seller_avg,
-        "rating_form": rating_form, 
-    })
-
 def product_detail(request, pk):
     """Shows one product's detailed page."""
     product = get_object_or_404(Product, pk=pk)
@@ -205,28 +187,10 @@ def add_product(request):
             return redirect('marketplace:store_detail', pk=request.user.profile.pk)
     return redirect('marketplace:store_detail', pk=request.user.profile.pk)
 
-def store_detail(request, pk):
-    profile = get_object_or_404(Profile, pk=pk)
-    products = profile.products.filter(status=Product.Status.AVAILABLE)
-    faqs = profile.faqs.all()
-    reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
-    seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
-    rating_form = RatingForm()
-    product_form = ProductForm()  # <-- Pass product_form for the modal overlay
-
-    return render(request, "marketplace/store_detail.html", {
-        "profile": profile,
-        "products": products,
-        "faqs": faqs,
-        "reviews": reviews,         
-        "seller_avg": seller_avg,
-        "rating_form": rating_form,
-        "product_form": product_form,
-    })
 
 def store_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
-    products = profile.products.filter(status=Product.Status.AVAILABLE)
+    products = profile.products.all()
     faqs = profile.faqs.all()
     reviews = profile.ratings_received.filter(rating_type=Rating.RatingType.SELLER)
     seller_avg = reviews.aggregate(Avg("score"))["score__avg"]
@@ -256,3 +220,13 @@ def edit_profile(request):
     else:
         form = ProfileEditForm(instance=profile)
     return redirect("marketplace:store_detail", pk=profile.pk)
+
+@login_required
+def update_product_status(request, pk):
+    product = get_object_or_404(Product, pk=pk, seller=request.user.profile)
+    if request.method == "POST":
+        status = request.POST.get("status")
+        if status in dict(Product.Status.choices):
+            product.status = status
+            product.save()
+    return redirect("marketplace:product_detail", pk=product.pk)
