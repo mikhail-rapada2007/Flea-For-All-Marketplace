@@ -20,9 +20,30 @@
         <h2>{{ product.title }}</h2>
         <p class="fs-4 fw-bold">₱{{ product.price|floatformat:2 }}</p>
 
-        <span class="badge bg-secondary">{{ product.get_status_display }}</span>
-        <span class="badge bg-info text-dark">{{ product.get_condition_display }}</span>
-        <span class="badge bg-light text-dark">{{ product.get_category_display }}</span>
+{% if user.is_authenticated and user == product.seller.user %}
+<!-- Editable dropdown for seller -->
+<form action="{% url 'marketplace:update_product_status' product.pk %}" method="post" class="d-inline">
+    {% csrf_token %}
+    <select name="status" class="form-select form-select-sm d-inline w-auto">
+        {% for value, label in product.Status.choices %}
+            <option value="{{ value }}" {% if product.status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-sm btn-primary ms-1">Update</button>
+</form>
+{% else %}
+<!-- Read-only badges for buyers -->
+<span class="badge
+    {% if product.status == 'AVAILABLE' %}bg-success
+    {% elif product.status == 'RESERVED' %}bg-warning text-dark
+    {% elif product.status == 'SOLD' %}bg-danger
+    {% endif %}">
+    {{ product.get_status_display }}
+</span>
+{% endif %}
+
+<span class="badge bg-info text-dark">{{ product.get_condition_display }}</span>
+<span class="badge bg-light text-dark">{{ product.get_category_display }}</span>
 
         <p class="mt-3">{{ product.description }}</p>
 
