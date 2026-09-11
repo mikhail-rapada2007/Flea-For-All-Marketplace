@@ -369,6 +369,12 @@
                   href="{% url 'marketplace:store_detail' user.profile.pk %}">MY STORE</a>
               </li>
             {% endif %}
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}" 
+                           href="{% url 'marketplace:inbox' %}">MESSAGES</a>
+                </li>
+            {% endif %}
             </li>
 
           </ul>
