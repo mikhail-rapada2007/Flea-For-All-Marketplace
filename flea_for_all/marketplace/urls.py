@@ -16,6 +16,7 @@ urlpatterns = [
     path("messages/start/<int:seller_pk>/", views.start_conversation, name="start_conversation"),
     path("messages/send/<int:pk>/", views.send_widget_message, name="send_widget_message"),
     path("messages/close/<int:pk>/", views.close_chat, name="close_chat"),
+    path("messages/<int:pk>/", views.conversation_detail, name="conversation_detail"),
     path("faq/add/", views.add_faq, name="add_faq"),
     path("faq/<int:pk>/edit/", views.edit_faq, name="edit_faq"),
     path("faq/<int:pk>/delete/", views.delete_faq, name="delete_faq"),
