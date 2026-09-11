@@ -57,6 +57,7 @@
     <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation();">
       {% if request.user.is_authenticated and request.user != profile.user %}
         <a href="{% url 'marketplace:start_conversation' profile.pk %}" class="btn btn-primary">Message Seller</a>
+        <a href="{% url 'marketplace:report_store' profile.pk %}" class="btn btn-outline-danger btn-sm">Report Store</a>
       {% endif %}
 
       {% if user.is_authenticated and user == profile.user %}

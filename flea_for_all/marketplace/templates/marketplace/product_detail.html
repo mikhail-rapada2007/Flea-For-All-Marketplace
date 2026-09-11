@@ -14,6 +14,14 @@
             <span class="fs-5">No image available</span>
         </div>
     {% endif %}
+    
+    <br>
+    
+    {% if user.is_authenticated and user != product.seller.user %}
+        <a href="{% url 'marketplace:report_product' product.pk %}" class="btn btn-outline-danger btn-sm">Report Item</a>
+    {% endif %}
+    
+
 </div>
 
     <div class="col-md-6">

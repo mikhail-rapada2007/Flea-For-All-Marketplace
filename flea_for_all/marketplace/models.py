@@ -71,9 +71,7 @@ class Product(models.Model):
         return f"{self.title} ({self.get_status_display()})"
 
 
-class Report(models.Model):
-#Reports are tied to a Product's auto-generated ID.
-
+class BaseReport(models.Model):
     class Reason(models.TextChoices):
         FAKE_LISTING = "FAKE", "Fake listing"
         SCAM = "SCAM", "Scam"
@@ -81,18 +79,30 @@ class Report(models.Model):
         DUPLICATE = "DUPLICATE", "Duplicate listing"
         OTHER = "OTHER", "Other"
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reports")
-    reporter = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="reports_filed")
+    reporter = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="%(class)s_filed")
     reason = models.CharField(max_length=20, choices=Reason.choices)
     details = models.TextField(blank=True)
     is_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        abstract = True
         ordering = ["-created_at"]
 
+
+class ProductReport(BaseReport):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reports")
+    class Meta(BaseReport.Meta):
+        pass
     def __str__(self):
         return f"Report on '{self.product.title}' ({self.get_reason_display()})"
+
+class StoreReport(BaseReport):
+    store = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="reports")
+    class Meta(BaseReport.Meta):
+        pass
+    def __str__(self):
+        return f"Report on '{self.store.user.username}' ({self.get_reason_display()})"
 
 class Rating(models.Model):
     class RatingType(models.TextChoices):

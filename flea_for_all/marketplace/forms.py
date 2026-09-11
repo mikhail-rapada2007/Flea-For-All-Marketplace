@@ -1,4 +1,4 @@
-from .models import Profile, Product, Rating, FAQ
+from .models import Profile, Product, Rating, FAQ, ProductReport, StoreReport
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -73,4 +73,20 @@ class ProfileEditForm(forms.ModelForm):
             'theme_background': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'theme_color': forms.TextInput(attrs={'class': 'form-control', 'type': 'color', 'style': 'height: 42px; padding: 4px;'}),
             'theme_font': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+class ProductReportForm(forms.ModelForm):
+    class Meta:
+        model = ProductReport
+        fields = ["reason", "details"]
+        widgets = {
+            "details": forms.Textarea(attrs={"rows": 3, "placeholder": "Optional details..."}),
+        }
+
+class StoreReportForm(forms.ModelForm):
+    class Meta:
+        model = StoreReport
+        fields = ["reason", "details"]
+        widgets = {
+            "details": forms.Textarea(attrs={"rows": 3, "placeholder": "Optional details..."}),
         }

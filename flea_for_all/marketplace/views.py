@@ -168,7 +168,7 @@ def product_detail(request, pk):
     return render(request, "marketplace/product_detail.html", {"product": product})
 
 def category_detail(request, category_slug):
-    products = Product.objects.filter(status=Product.Status.AVAILABLE, category=category_slug)
+    products = Product.objects.all()
     return render(request, "marketplace/category_detail.html", {
         "products": products,
         "selected_category": category_slug,
@@ -230,3 +230,40 @@ def update_product_status(request, pk):
             product.status = status
             product.save()
     return redirect("marketplace:product_detail", pk=product.pk)
+
+from django.contrib import messages
+from .forms import ProductReportForm, StoreReportForm
+from .models import ProductReport, StoreReport
+
+@login_required
+def report_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == "POST":
+        form = ProductReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.product = product
+            report.reporter = request.user
+            report.save()
+            messages.success(request, "Report submitted. Thank you.")
+            return redirect("marketplace:product_detail", pk=product.pk)
+    else:
+        form = ProductReportForm()
+    return render(request, "marketplace/report_product.html", {"form": form, "product": product})
+
+
+@login_required
+def report_store(request, pk):
+    store = get_object_or_404(Profile, pk=pk)
+    if request.method == "POST":
+        form = StoreReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.store = store
+            report.reporter = request.user
+            report.save()
+            messages.success(request, "Report submitted. Thank you.")
+            return redirect("marketplace:store_detail", pk=store.pk)
+    else:
+        form = StoreReportForm()
+    return render(request, "marketplace/report_store.html", {"form": form, "store": store})
