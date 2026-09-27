@@ -3,8 +3,8 @@ A peer-to-peer marketplace web application built with Django, inspired by platfo
 This is the official output of Group 2 of CPE-201, 2026-2027. 
 
 ## Tech Stack
-- **Backend:** Python, Django
-- **Frontend:** HTML, Bootstrap 5
+- **Backend:** Python 3.9.13, Django 4.2.30
+- **Frontend:** HTML 5, Bootstrap 5
 - **Database:** SQLite (local development)
 
 ## Getting Started
