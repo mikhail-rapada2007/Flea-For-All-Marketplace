@@ -1,36 +1,399 @@
-<div id="chatWidgetsContainer" class="chat-widgets-container">
-  {% for conversation in open_conversations %}
-    <div class="chat-widget" data-conversation-id="{{ conversation.pk }}">
-      <div class="chat-widget-header d-flex justify-content-between align-items-center p-2 bg-market-brown text-white">
-        <div class="d-flex align-items-center gap-2">
-          {% if conversation.other_user.profile.profile_picture_url %}
-            <img src="{{ conversation.other_user.profile.profile_picture_url }}" class="chat-avatar" alt="">
-          {% else %}
-            <div class="chat-avatar chat-avatar-placeholder"></div>
-          {% endif %}
-          <span class="fw-bold">{{ conversation.other_user.profile.store_name|default:conversation.other_user.username }}</span>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-light me-1 chat-minimize-btn">_</button>
-          <a href="{% url 'marketplace:close_chat' conversation.pk %}" class="btn btn-sm btn-outline-light">✕</a>
-        </div>
-      </div>
-      <div class="chat-widget-body">
-        <div class="chat-widget-messages p-2">
-          {% for message in conversation.messages.all %}
-            <div class="mb-2 {% if message.sender == request.user %}text-end{% endif %}">
-              <strong>{{ message.sender.username }}:</strong> {{ message.content }}
-            </div>
-          {% endfor %}
-        </div>
-        <form method="post" action="{% url 'marketplace:send_widget_message' conversation.pk %}" class="chat-widget-form p-2">
-          {% csrf_token %}
-          <div class="input-group">
-            <input type="text" name="content" class="form-control" placeholder="Type a message..." required>
-            <button type="submit" class="btn btn-primary">Send</button>
+<style>
+  .chat-widgets-container {
+    position: fixed;
+    bottom: 0;
+    right: 24px;
+    display: flex !important;
+    flex-direction: row-reverse;
+    align-items: flex-end;
+    gap: 14px;
+    z-index: 99999;
+    pointer-events: none;
+    font-family: var(--font-default, 'Montserrat', sans-serif);
+  }
+
+  .chat-widget {
+    width: 270px;
+    background: #FAF5EB;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-widget-header {
+    background-color: #524336;
+    color: #ffffff;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+  }
+
+  .chat-avatar-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: #7A7A7A;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .chat-widget-title {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .chat-btn-box {
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    border-radius: 4px;
+    background: transparent;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .chat-widget.minimized .chat-minimize-btn {
+    background-color: #524336;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.85);
+  }
+
+  .chat-widget-body {
+    display: flex;
+    flex-direction: column;
+    height: 180px;
+    background-color: #FAF5EB;
+    padding: 10px;
+  }
+
+  .chat-widget.minimized .chat-widget-body {
+    display: none !important;
+  }
+
+  .chat-widget-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 6px;
+  }
+
+  .chat-bubble-text {
+    font-size: 0.85rem;
+    color: #332b24;
+    word-break: break-word;
+  }
+
+  .chat-bubble-text.chat-me {
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .chat-bubble-text.chat-them {
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .chat-widget-footer {
+    padding-top: 4px;
+  }
+
+  .chat-input-group {
+    display: flex;
+    background: #ffffff;
+    border: 1px solid #d5cec5;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .chat-input-group input {
+    border: none;
+    outline: none;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    flex-grow: 1;
+    background: transparent;
+    color: #332b24;
+  }
+
+  .chat-input-group button {
+    background-color: #0070f3;
+    border: none;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 0 12px;
+    cursor: pointer;
+  }
+</style>
+
+{% if user.is_authenticated %}
+  <div class="chat-widgets-container">
+    {% for conversation in user.conversations.all %}
+      <div class="chat-widget" 
+           data-conversation-id="{{ conversation.id }}" 
+           data-api-url="{% url 'marketplace:api_conversation_messages' conversation.id %}"
+           id="chat-widget-{{ conversation.id }}">
+          
+        <div class="chat-widget-header">
+          <div class="d-flex align-items-center gap-2 overflow-hidden">
+            {% for participant in conversation.participants.all %}
+              {% if participant != user %}
+                {% if participant.profile.profile_picture %}
+                  <img src="{{ participant.profile.profile_picture.url }}" class="chat-avatar-circle" alt="{{ participant.username }}">
+                {% else %}
+                  <span class="chat-avatar-circle">{{ participant.username|make_list|first|upper }}</span>
+                {% endif %}
+                <span class="chat-widget-title">{{ participant.profile.store_name|default:participant.username }}</span>
+              {% endif %}
+            {% endfor %}
           </div>
-        </form>
+
+          <div class="chat-header-actions">
+            <button type="button" class="chat-btn-box chat-minimize-btn" title="Minimize">−</button>
+            <button type="button" class="chat-btn-box chat-close-btn" title="Close">✕</button>
+          </div>
+        </div>
+
+        <div class="chat-widget-body">
+          <div class="chat-widget-messages" id="chat-messages-{{ conversation.id }}">
+            {% for msg in conversation.messages.all %}
+              <div class="chat-bubble-text {% if msg.sender == user %}chat-me{% else %}chat-them{% endif %}" data-message-id="{{ msg.id }}">
+                {{ msg.sender.username }}: {{ msg.content }}
+              </div>
+            {% empty %}
+              <div class="small text-muted text-center my-auto no-msg">No messages yet.</div>
+            {% endfor %}
+          </div>
+
+          <div class="chat-widget-footer">
+            <form class="widget-chat-form m-0" 
+                  action="{% url 'marketplace:conversation_detail' conversation.id %}" 
+                  method="post" 
+                  data-conversation-id="{{ conversation.id }}" 
+                  data-username="{{ user.username }}">
+              {% csrf_token %}
+              <div class="chat-input-group">
+                <input type="text" name="content" placeholder="Type a message..." required autocomplete="off">
+                <button type="submit">Send</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
       </div>
-    </div>
-  {% endfor %}
-</div>
+    {% endfor %}
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
+      let closedIds = JSON.parse(localStorage.getItem('closedChats') || '[]');
+      const widgetStates = {};
+
+      document.querySelectorAll('.chat-widget').forEach(function (widget) {
+        const id = widget.dataset.conversationId;
+        const msgContainer = widget.querySelector('.chat-widget-messages');
+
+        const seenIds = new Set();
+        let maxId = 0;
+        if (msgContainer) {
+          msgContainer.querySelectorAll('[data-message-id]').forEach(el => {
+            const mId = parseInt(el.dataset.messageId, 10);
+            if (!isNaN(mId)) {
+              seenIds.add(mId);
+              if (mId > maxId) maxId = mId;
+            }
+          });
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+
+        widgetStates[id] = { seenIds: seenIds, maxId: maxId };
+
+        if (closedIds.includes(id)) {
+          widget.style.display = 'none';
+        }
+
+        if (minimizedIds.includes(id)) {
+          widget.classList.add('minimized');
+        }
+
+        // Minimize handler
+        const minBtn = widget.querySelector('.chat-minimize-btn');
+        if (minBtn) {
+          minBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            widget.classList.toggle('minimized');
+            minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
+            if (widget.classList.contains('minimized')) {
+              if (!minimizedIds.includes(id)) minimizedIds.push(id);
+            } else {
+              minimizedIds = minimizedIds.filter(x => x !== id);
+              if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
+            }
+            localStorage.setItem('minimizedChats', JSON.stringify(minimizedIds));
+          });
+        }
+
+        // Close handler
+        const closeBtn = widget.querySelector('.chat-close-btn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            widget.style.display = 'none';
+            closedIds = JSON.parse(localStorage.getItem('closedChats') || '[]');
+            if (!closedIds.includes(id)) {
+              closedIds.push(id);
+              localStorage.setItem('closedChats', JSON.stringify(closedIds));
+            }
+          });
+        }
+      });
+
+      // Submit message from widget
+      document.querySelectorAll('.widget-chat-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const input = form.querySelector('input[name="content"]');
+          const text = input.value.trim();
+          if (!text) return;
+
+          const convId = form.dataset.conversationId;
+          const currentUsername = form.dataset.username;
+          const msgContainer = document.getElementById('chat-messages-' + convId);
+          const state = widgetStates[convId];
+
+          let tempBubble = null;
+          if (msgContainer) {
+            const emptyNotice = msgContainer.querySelector('.no-msg');
+            if (emptyNotice) emptyNotice.remove();
+
+            tempBubble = document.createElement('div');
+            tempBubble.className = 'chat-bubble-text chat-me pending-widget-bubble';
+            tempBubble.textContent = currentUsername + ': ' + text;
+            msgContainer.appendChild(tempBubble);
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+          }
+
+          const formData = new FormData(form);
+          const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+          input.value = '';
+
+          fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrfToken
+            }
+          })
+          .then(res => {
+            if (!res.ok) throw new Error('Send failed');
+            return res.json();
+          })
+          .then(data => {
+            if (data && data.id && state) {
+              state.seenIds.add(data.id);
+              if (data.id > state.maxId) state.maxId = data.id;
+              if (tempBubble) {
+                tempBubble.dataset.messageId = data.id;
+                tempBubble.classList.remove('pending-widget-bubble');
+              }
+            }
+          })
+          .catch(err => {
+            console.error('Widget send error:', err);
+            if (tempBubble) tempBubble.style.opacity = '0.5';
+          });
+        });
+      });
+
+      // Widget polling loop (every 3 seconds)
+      setInterval(function () {
+        if (document.hidden) return;
+
+        const closed = JSON.parse(localStorage.getItem('closedChats') || '[]');
+        const currentPath = window.location.pathname;
+
+        document.querySelectorAll('.chat-widget').forEach(function (widget) {
+          const id = widget.dataset.conversationId;
+          const apiUrl = widget.dataset.apiUrl;
+
+          if (closed.includes(id) || widget.style.display === 'none') return;
+
+          // Never double-poll if already on that conversation's page
+          if (currentPath.match(new RegExp('[/](conversations|messages)[/]' + id + '([/]|$)'))) {
+            return;
+          }
+
+          const state = widgetStates[id] || { seenIds: new Set(), maxId: 0 };
+          const msgContainer = document.getElementById('chat-messages-' + id);
+          if (!msgContainer) return;
+
+          fetch(`${apiUrl}?last_id=${state.maxId}`)
+            .then(res => {
+              if (res.status === 204) return null;
+              return res.json();
+            })
+            .then(data => {
+              if (!data || !data.messages || data.messages.length === 0) return;
+
+              const emptyNotice = msgContainer.querySelector('.no-msg');
+              if (emptyNotice) emptyNotice.remove();
+
+              data.messages.forEach(msg => {
+                if (msg.id > state.maxId) state.maxId = msg.id;
+                if (state.seenIds.has(msg.id)) return;
+                state.seenIds.add(msg.id);
+
+                const pending = msgContainer.querySelector('.pending-widget-bubble');
+                if (pending && msg.is_me) {
+                  pending.dataset.messageId = msg.id;
+                  pending.classList.remove('pending-widget-bubble');
+                  return;
+                }
+
+                const div = document.createElement('div');
+                div.className = 'chat-bubble-text ' + (msg.is_me ? 'chat-me' : 'chat-them');
+                div.dataset.messageId = msg.id;
+                div.textContent = msg.sender + ': ' + msg.content;
+                msgContainer.appendChild(div);
+              });
+
+              msgContainer.scrollTop = msgContainer.scrollHeight;
+            })
+            .catch(err => console.error('Widget poll error:', err));
+        });
+      }, 3000);
+    });
+  </script>
+{% endif %}
