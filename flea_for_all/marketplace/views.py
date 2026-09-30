@@ -214,13 +214,47 @@ def signup(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.is_active = False  # blocked from logging in until verified
+            user.save()
             Profile.objects.create(user=user)
-            login(request, user)
-            return redirect("marketplace:home")
+
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            verify_url = request.build_absolute_uri(
+                reverse("marketplace:verify_email", kwargs={"uidb64": uid, "token": token})
+            )
+
+            send_mail(
+                subject="Verify your Flea For All account",
+                message=f"Hi {user.username},\n\nClick the link below to verify your email and activate your account:\n\n{verify_url}\n\nIf you didn't sign up, ignore this email.",
+                from_email=None,
+                recipient_list=[user.email],
+            )
+
+            return render(request, "marketplace/check_email.html", {"email": user.email})
     else:
         form = SignUpForm()
     return render(request, "marketplace/signup.html", {"form": form})
+
+def verify_email(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        user.profile.is_verified = True
+        user.profile.save()
+        login(request, user)
+        messages.success(request, "Your email has been verified! Welcome to Flea For All.")
+        return redirect("marketplace:home")
+    else:
+        messages.error(request, "This verification link is invalid or has expired.")
+        return redirect("login")
 
 def terms_view(request):
     return render(request, "marketplace/terms.html")

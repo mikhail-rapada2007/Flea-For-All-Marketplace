@@ -31,4 +31,5 @@ urlpatterns = [
     path("products/<int:pk>/status/", views.update_product_status, name="update_product_status"),
     path("product/<int:pk>/report/", views.report_product, name="report_product"),
     path("store/<int:pk>/report/", views.report_store, name="report_store"),
+    path("verify-email/<uidb64>/<token>/", views.verify_email, name="verify_email"),
     ]
