@@ -1,19 +1,178 @@
 {% extends 'marketplace/base.html' %}
 {% block content %}
   <h2 class="mb-4">Conversation</h2>
-  <div class="mb-4">
+
+  <div class="mb-4" id="conversation-messages-list" data-api-url="{% url 'marketplace:api_conversation_messages' conversation.id %}">
     {% for message in conversation.messages.all %}
-      <div class="market-card p-2 mb-2 {% if message.sender == request.user %}text-end{% endif %}">
+      <div class="market-card p-2 mb-2 {% if message.sender == request.user %}text-end{% endif %}" data-message-id="{{ message.id }}">
         <strong>{{ message.sender.username }}:</strong> {{ message.content }}
         <div class="small text-white-50">{{ message.sent_at|date:"M d, g:i A" }}</div>
       </div>
+    {% empty %}
+      <div id="no-messages-placeholder" class="text-muted text-center py-3">No messages yet.</div>
     {% endfor %}
   </div>
-  <form method="post">
+
+  <form method="post" id="conversation-detail-form" action="{% url 'marketplace:conversation_detail' conversation.id %}">
     {% csrf_token %}
     <div class="input-group">
-      <input type="text" name="content" class="form-control" placeholder="Type a message..." required>
+      <input type="text" name="content" class="form-control" placeholder="Type a message..." required autocomplete="off">
       <button type="submit" class="btn btn-primary">Send</button>
     </div>
   </form>
+
+// UNDER CONSTRUCTION: API endpoint to fetch messages for a conversation (MIGHT BE REMOVED LATER)_____________________________________________
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const listContainer = document.getElementById('conversation-messages-list');
+      const chatForm = document.getElementById('conversation-detail-form');
+      if (!listContainer) return;
+
+      const apiUrl = listContainer.dataset.apiUrl;
+      const currentUsername = "{{ request.user.username }}";
+      const seenMessageIds = new Set();
+      let maxKnownId = 0;
+
+      // 1. Index messages loaded on initial render
+      listContainer.querySelectorAll('[data-message-id]').forEach(el => {
+        const idVal = parseInt(el.dataset.messageId, 10);
+        if (!isNaN(idVal)) {
+          seenMessageIds.add(idVal);
+          if (idVal > maxKnownId) maxKnownId = idVal;
+        }
+      });
+
+      window.scrollTo(0, document.body.scrollHeight);
+
+      // 2. Poll every 3 seconds (pauses when tab is inactive)
+      setInterval(function () {
+        if (document.hidden) return;
+
+        fetch(`${apiUrl}?last_id=${maxKnownId}`)
+          .then(res => {
+            if (res.status === 204) return null;
+            return res.json();
+          })
+          .then(data => {
+            if (!data || !data.messages || data.messages.length === 0) return;
+
+            const emptyNotice = document.getElementById('no-messages-placeholder');
+            if (emptyNotice) emptyNotice.remove();
+
+            const wasNearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 200);
+
+            data.messages.forEach(msg => {
+              if (msg.id > maxKnownId) maxKnownId = msg.id;
+              if (seenMessageIds.has(msg.id)) return;
+              seenMessageIds.add(msg.id);
+
+              // Replace optimistic temporary bubble if present
+              const pendingBubble = listContainer.querySelector('.pending-bubble');
+              if (pendingBubble && msg.is_me) {
+                pendingBubble.dataset.messageId = msg.id;
+                pendingBubble.classList.remove('pending-bubble');
+                const timeEl = pendingBubble.querySelector('.small');
+                if (timeEl) timeEl.textContent = 'Just now';
+                return;
+              }
+
+              const bubble = document.createElement('div');
+              bubble.className = `market-card p-2 mb-2 ${msg.is_me ? 'text-end' : ''}`;
+              bubble.dataset.messageId = msg.id;
+              bubble.innerHTML = `
+                <strong>${msg.sender}:</strong> ${msg.content}
+                <div class="small text-white-50">Just now</div>
+              `;
+              listContainer.appendChild(bubble);
+            });
+
+            if (wasNearBottom) {
+              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }
+          })
+          .catch(err => console.error('Poll failed:', err));
+      }, 3000);
+
+      // 3. Async submit form on the Conversation Detail page
+      if (chatForm) {
+        chatForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const input = chatForm.querySelector('input[name="content"]');
+          const text = input.value.trim();
+          if (!text) return;
+
+          const emptyNotice = document.getElementById('no-messages-placeholder');
+          if (emptyNotice) emptyNotice.remove();
+
+          // 1. Optimistically append to main conversation view
+          const tempBubble = document.createElement('div');
+          tempBubble.className = 'market-card p-2 mb-2 text-end pending-bubble';
+          tempBubble.innerHTML = `
+            <strong>${currentUsername}:</strong> ${text}
+            <div class="small text-white-50">Sending...</div>
+          `;
+          listContainer.appendChild(tempBubble);
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+          // 2. Also append immediately to bottom-right widget if it exists on screen
+          const convId = "{{ conversation.id }}";
+          const widgetMessages = document.getElementById('chat-messages-' + convId);
+          let widgetTemp = null;
+          if (widgetMessages) {
+            const noMsgWidget = widgetMessages.querySelector('.no-msg');
+            if (noMsgWidget) noMsgWidget.remove();
+
+            widgetTemp = document.createElement('div');
+            widgetTemp.className = 'chat-bubble-text chat-me pending-widget-bubble';
+            widgetTemp.textContent = currentUsername + ': ' + text;
+            widgetMessages.appendChild(widgetTemp);
+            widgetMessages.scrollTop = widgetMessages.scrollHeight;
+          }
+
+          const formData = new FormData(chatForm);
+          const csrfToken = chatForm.querySelector('[name=csrfmiddlewaretoken]').value;
+          input.value = '';
+
+            fetch(chatForm.action || window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrfToken
+            }
+          })
+          .then(async res => {
+            if (!res.ok) throw new Error('HTTP status ' + res.status);
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              return await res.json();
+            }
+            return null; // Gracefully handle non-JSON responses without throwing SyntaxError
+          })
+          .then(data => {
+            if (data && data.id) {
+              tempBubble.dataset.messageId = data.id;
+              seenMessageIds.add(data.id);
+              if (data.id > maxKnownId) maxKnownId = data.id;
+              if (widgetTemp) {
+                widgetTemp.dataset.messageId = data.id;
+                widgetTemp.classList.remove('pending-widget-bubble');
+              }
+            }
+            tempBubble.classList.remove('pending-bubble');
+            const timeEl = tempBubble.querySelector('.small');
+            if (timeEl) timeEl.textContent = 'Just now';
+          })
+          .catch(err => {
+            console.error('Submit error:', err);
+            const timeEl = tempBubble.querySelector('.small');
+            if (timeEl) timeEl.textContent = 'Failed to send';
+            if (widgetTemp) widgetTemp.style.opacity = '0.5';
+          });
+        });
+      }
+    }); 
+  </script>
+//UPTO THIS POINT______________________________________________________________________________________________________________________________
+
 {% endblock %}

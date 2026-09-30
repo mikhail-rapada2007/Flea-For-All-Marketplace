@@ -4,6 +4,7 @@ from django.db.models import Avg
 from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm
 from .models import Profile, Product, Rating, FAQ, Conversation, Message
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 
 def home(request):
     category_filter = request.GET.get("category")
@@ -140,6 +141,74 @@ def add_review(request, pk):
         
     return render(request, "marketplace/review_form.html", {"form": form, "store": store_profile})
 
+# UNDER CONSTRUCTION: API endpoint to fetch messages for a conversation (MIGHT BE REMOVED LATER)_____________________________________________
+@login_required
+def conversation_detail(request, pk):
+    conversation = get_object_or_404(Conversation, pk=pk)
+
+    if request.user not in conversation.participants.all():
+        return HttpResponseForbidden("Unauthorized")
+
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        is_ajax = (
+            request.headers.get('x-requested-with') == 'XMLHttpRequest' or
+            request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+        )
+
+        if content:
+            msg = Message.objects.create(
+                conversation=conversation,
+                sender=request.user,
+                content=content
+            )
+            if is_ajax:
+                return JsonResponse({
+                    'status': 'ok',
+                    'id': msg.id,
+                    'content': msg.content,
+                    'sender': msg.sender.username,
+                    'is_me': True
+                })
+        else:
+            if is_ajax:
+                return JsonResponse({'status': 'empty'}, status=400)
+
+        return redirect('marketplace:conversation_detail', pk=pk)
+
+    return render(request, 'marketplace/conversation_detail.html', {'conversation': conversation})
+
+
+@login_required
+def get_messages_api(request, pk):
+    conversation = get_object_or_404(Conversation, pk=pk)
+
+    if request.user not in conversation.participants.all():
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    try:
+        last_id = int(request.GET.get('last_id', 0))
+    except (ValueError, TypeError):
+        last_id = 0
+
+    if last_id > 0:
+        new_messages = conversation.messages.filter(id__gt=last_id).order_by('sent_at')
+        if not new_messages.exists():
+            return HttpResponse(status=204)
+    else:
+        new_messages = conversation.messages.all().order_by('sent_at')
+
+    messages_data = [
+        {
+            'id': msg.id,
+            'sender': msg.sender.username,
+            'content': msg.content,
+            'is_me': msg.sender == request.user
+        }
+        for msg in new_messages
+    ]
+    return JsonResponse({'messages': messages_data})
+# UPTO THIS POINT______________________________________________________________________________________________________________________________
 
 def signup(request):
     if request.method == "POST":

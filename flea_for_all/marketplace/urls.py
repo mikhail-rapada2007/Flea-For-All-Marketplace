@@ -5,6 +5,9 @@ from . import views
 app_name = "marketplace"
 
 urlpatterns = [
+    # UNDER CONSTRUCTION: API endpoint to fetch messages for a conversation (MIGHT BE REMOVED LATER)_________________________________________________
+    path('conversations/<int:pk>/api/messages/', views.get_messages_api, name='api_conversation_messages'),
+
     path("", views.home, name="home"),
     path("signup/", views.signup, name="signup"),
     path("terms/", views.terms_view, name="terms"),
