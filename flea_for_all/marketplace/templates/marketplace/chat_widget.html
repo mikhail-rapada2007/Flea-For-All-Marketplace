@@ -1,36 +1,65 @@
-<div id="chatWidgetsContainer" class="chat-widgets-container">
-  {% for conversation in open_conversations %}
-    <div class="chat-widget" data-conversation-id="{{ conversation.pk }}">
-      <div class="chat-widget-header d-flex justify-content-between align-items-center p-2 bg-market-brown text-white">
-        <div class="d-flex align-items-center gap-2">
-          {% if conversation.other_user.profile.profile_picture_url %}
-            <img src="{{ conversation.other_user.profile.profile_picture_url }}" class="chat-avatar" alt="">
-          {% else %}
-            <div class="chat-avatar chat-avatar-placeholder"></div>
-          {% endif %}
-          <span class="fw-bold">{{ conversation.other_user.profile.store_name|default:conversation.other_user.username }}</span>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-light me-1 chat-minimize-btn">_</button>
-          <a href="{% url 'marketplace:close_chat' conversation.pk %}" class="btn btn-sm btn-outline-light">✕</a>
-        </div>
-      </div>
-      <div class="chat-widget-body">
-        <div class="chat-widget-messages p-2">
-          {% for message in conversation.messages.all %}
-            <div class="mb-2 {% if message.sender == request.user %}text-end{% endif %}">
-              <strong>{{ message.sender.username }}:</strong> {{ message.content }}
-            </div>
-          {% endfor %}
-        </div>
-        <form method="post" action="{% url 'marketplace:send_widget_message' conversation.pk %}" class="chat-widget-form p-2">
-          {% csrf_token %}
-          <div class="input-group">
-            <input type="text" name="content" class="form-control" placeholder="Type a message..." required>
-            <button type="submit" class="btn btn-primary">Send</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  {% endfor %}
+<!-- marketplace/templates/marketplace/chat_widget.html -->
+<style>
+.chat-widgets-container {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 12px;
+  z-index: 1050;
+}
+.chat-widget {
+  width: 280px;
+  background: var(--bg-col);
+  border: 2px solid var(--card-brown);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+}
+.chat-avatar, .chat-avatar-placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #888;
+}
+.chat-widget-messages {
+  max-height: 250px;
+  overflow-y: auto;
+}
+.chat-widget.minimized .chat-widget-body {
+  display: none;
+}
+</style>
+
+<div class="chat-widgets-container">
+  <!-- Your existing chat widget markup here -->
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  let minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
+
+  document.querySelectorAll('.chat-widget').forEach(function (widget) {
+    const id = widget.dataset.conversationId;
+    if (minimizedIds.includes(id)) {
+      widget.classList.add('minimized');
+    }
+    const btn = widget.querySelector('.chat-minimize-btn');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        widget.classList.toggle('minimized');
+        const isMin = widget.classList.contains('minimized');
+        minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
+        if (isMin) {
+          if (!minimizedIds.includes(id)) minimizedIds.push(id);
+        } else {
+          minimizedIds = minimizedIds.filter(x => x !== id);
+        }
+        localStorage.setItem('minimizedChats', JSON.stringify(minimizedIds));
+      });
+    }
+  });
+});
+</script>
