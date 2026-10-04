@@ -2,9 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-class Profile(models.Model):
-#User's profile acts as the 'store' page: bio + listings.
 
+class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to="profiles/avatars/", blank=True, null=True)
@@ -28,8 +27,6 @@ class Profile(models.Model):
 
 
 class Product(models.Model):
-#A single listing. Status is controlled by the seller (User).
-
     class Category(models.TextChoices):
         ELECTRONICS = "ELECTRONICS", "Electronics"
         CLOTHING = "CLOTHING", "Clothing"
@@ -92,17 +89,17 @@ class BaseReport(models.Model):
 
 class ProductReport(BaseReport):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reports")
-    class Meta(BaseReport.Meta):
-        pass
+
     def __str__(self):
         return f"Report on '{self.product.title}' ({self.get_reason_display()})"
 
+
 class StoreReport(BaseReport):
     store = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="reports")
-    class Meta(BaseReport.Meta):
-        pass
+
     def __str__(self):
         return f"Report on '{self.store.user.username}' ({self.get_reason_display()})"
+
 
 class Rating(models.Model):
     class RatingType(models.TextChoices):
@@ -137,13 +134,19 @@ class FAQ(models.Model):
     def __str__(self):
         return f"{self.store.user.username}'s FAQ: {self.question[:50]}"
 
+
 class Conversation(models.Model):
     participants = models.ManyToManyField(User, related_name="conversations")
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name="conversations")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
+
+    def get_other_user(self, current_user):
+        return self.participants.exclude(pk=current_user.pk).first()
+
+    def __str__(self):
+        return f"Conversation #{self.pk}"
 
 
 class Message(models.Model):
@@ -155,3 +158,5 @@ class Message(models.Model):
     class Meta:
         ordering = ["sent_at"]
 
+    def __str__(self):
+        return f"Message from {self.sender.username} at {self.sent_at}"

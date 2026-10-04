@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="chat-widget-body">
-        <div class="chat-widget-messages p-2">
+        <div class="chat-widget-messages p-2" id="chat-messages-{{ conversation.pk }}">
           {% for message in conversation.messages.all %}
             <div class="mb-2 {% if message.sender == request.user %}text-end{% endif %}">
               <strong>{{ message.sender.username }}:</strong> {{ message.content }}
@@ -26,11 +26,21 @@
         <form method="post" action="{% url 'marketplace:send_widget_message' conversation.pk %}" class="chat-widget-form p-2">
           {% csrf_token %}
           <div class="input-group">
-            <input type="text" name="content" class="form-control" placeholder="Type a message..." required>
-            <button type="submit" class="btn btn-primary">Send</button>
+            <input type="text" name="content" class="form-control form-control-sm" placeholder="Type a message..." required autocomplete="off">
+            <button type="submit" class="btn btn-sm btn-primary">Send</button>
           </div>
         </form>
       </div>
     </div>
   {% endfor %}
 </div>
+
+<script>
+  // Ensure chat widget containers scroll to the newest message automatically
+  document.addEventListener("DOMContentLoaded", function () {
+    const chatContainers = document.querySelectorAll(".chat-widget-messages");
+    chatContainers.forEach(function (container) {
+      container.scrollTop = container.scrollHeight;
+    });
+  });
+</script>

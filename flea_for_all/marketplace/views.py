@@ -87,9 +87,32 @@ def close_chat(request, pk):
     return redirect(request.META.get("HTTP_REFERER", "marketplace:home"))
 
 @login_required
-def inbox(request):
-    conversations = request.user.conversations.all()
-    return render(request, "marketplace/inbox.html", {"conversations": conversations})
+def inbox(request, conversation_id=None):
+    conversations = Conversation.objects.filter(participants=request.user).order_by('-created_at')
+    conversation_list = list(conversations)
+
+    for convo in conversation_list:
+        convo.other_person = convo.get_other_user(request.user)
+
+    active_conversation = None
+    if conversation_id:
+        active_conversation = get_object_or_404(Conversation, pk=conversation_id, participants=request.user)
+        active_conversation.other_person = active_conversation.get_other_user(request.user)
+
+    if request.method == "POST" and active_conversation:
+        content = request.POST.get("content", "").strip()
+        if content:
+            Message.objects.create(
+                conversation=active_conversation,
+                sender=request.user,
+                content=content
+            )
+            return redirect('marketplace:conversation_detail', conversation_id=active_conversation.pk)
+
+    return render(request, "marketplace/inbox.html", {
+        "conversations": conversation_list,
+        "active_conversation": active_conversation,
+    })
 
 @login_required
 def add_faq(request):

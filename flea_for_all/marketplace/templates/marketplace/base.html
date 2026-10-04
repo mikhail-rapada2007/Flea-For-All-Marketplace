@@ -127,31 +127,36 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
 
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-      let minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
 
-      document.querySelectorAll('.chat-widget').forEach(function (widget) {
-          const id = widget.dataset.conversationId;
-          if (minimizedIds.includes(id)) {
-              widget.classList.add('minimized');
-          }
-          const btn = widget.querySelector('.chat-minimize-btn');
-          if (btn) {
-              btn.addEventListener('click', function () {
-                  widget.classList.toggle('minimized');
-                  const isMin = widget.classList.contains('minimized');
-                  minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
-                  if (isMin) {
-                      if (!minimizedIds.includes(id)) minimizedIds.push(id);
-                  } else {
-                      minimizedIds = minimizedIds.filter(x => x !== id);
-                  }
-                  localStorage.setItem('minimizedChats', JSON.stringify(minimizedIds));
-              });
-          }
-      });
-  });
-  </script>
-</body>
+  {% if not '/messages/' in request.path %}
+    {% include 'marketplace/chat_widget.html' %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
+
+        document.querySelectorAll('.chat-widget').forEach(function (widget) {
+            const id = widget.dataset.conversationId;
+            if (minimizedIds.includes(id)) {
+                widget.classList.add('minimized');
+            }
+            const btn = widget.querySelector('.chat-minimize-btn');
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    widget.classList.toggle('minimized');
+                    const isMin = widget.classList.contains('minimized');
+                    minimizedIds = JSON.parse(localStorage.getItem('minimizedChats') || '[]');
+                    if (isMin) {
+                        if (!minimizedIds.includes(id)) minimizedIds.push(id);
+                    } else {
+                        minimizedIds = minimizedIds.filter(x => x !== id);
+                    }
+                    localStorage.setItem('minimizedChats', JSON.stringify(minimizedIds));
+                });
+            }
+        });
+    });
+    </script>
+  {% endif %}
+  </body>
 </html>
