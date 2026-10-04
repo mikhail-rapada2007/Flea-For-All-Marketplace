@@ -5,53 +5,47 @@
 {% block content %}
 <div class="row">
     <div class="col-md-6">
-    {% if product.image %}
-        <div class="ratio ratio-1x1 rounded overflow-hidden shadow-sm border">
-            <img src="{{ product.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ product.title }}">
-        </div>
-    {% else %}
-        <div class="ratio ratio-1x1 rounded bg-secondary d-flex align-items-center justify-content-center text-white">
-            <span class="fs-5">No image available</span>
-        </div>
-    {% endif %}
-    
-    <br>
-    
-    {% if user.is_authenticated and user != product.seller.user %}
-        <a href="{% url 'marketplace:report_product' product.pk %}" class="btn btn-outline-danger btn-sm">Report Item</a>
-    {% endif %}
-    
-
-</div>
+        {% if product.image %}
+            <div class="ratio ratio-1x1 rounded overflow-hidden shadow-sm border mb-3">
+                <img src="{{ product.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ product.title }}">
+            </div>
+        {% else %}
+            <div class="ratio ratio-1x1 rounded bg-secondary d-flex align-items-center justify-content-center text-white mb-3">
+                <span class="fs-5">No image available</span>
+            </div>
+        {% endif %}
+        
+        {% if user.is_authenticated and user != product.seller.user %}
+            <a href="{% url 'marketplace:report_product' product.pk %}" class="btn btn-outline-danger btn-sm">Report Item</a>
+        {% endif %}
+    </div>
 
     <div class="col-md-6">
         <h2>{{ product.title }}</h2>
         <p class="fs-4 fw-bold">₱{{ product.price|floatformat:2 }}</p>
 
-{% if user.is_authenticated and user == product.seller.user %}
-<!-- Editable dropdown for seller -->
-<form action="{% url 'marketplace:update_product_status' product.pk %}" method="post" class="d-inline">
-    {% csrf_token %}
-    <select name="status" class="form-select form-select-sm d-inline w-auto">
-        {% for value, label in product.Status.choices %}
-            <option value="{{ value }}" {% if product.status == value %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit" class="btn btn-sm btn-primary ms-1">Update</button>
-</form>
-{% else %}
-<!-- Read-only badges for buyers -->
-<span class="badge
-    {% if product.status == 'AVAILABLE' %}bg-success
-    {% elif product.status == 'RESERVED' %}bg-warning text-dark
-    {% elif product.status == 'SOLD' %}bg-danger
-    {% endif %}">
-    {{ product.get_status_display }}
-</span>
-{% endif %}
+        {% if user.is_authenticated and user == product.seller.user %}
+        <form action="{% url 'marketplace:update_product_status' product.pk %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <select name="status" class="form-select form-select-sm d-inline w-auto">
+                {% for value, label in product.Status.choices %}
+                    <option value="{{ value }}" {% if product.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary ms-1">Update</button>
+        </form>
+        {% else %}
+        <span class="badge
+            {% if product.status == 'AVAILABLE' %}bg-success
+            {% elif product.status == 'RESERVED' %}bg-warning text-dark
+            {% elif product.status == 'SOLD' %}bg-danger
+            {% endif %}">
+            {{ product.get_status_display }}
+        </span>
+        {% endif %}
 
-<span class="badge bg-info text-dark">{{ product.get_condition_display }}</span>
-<span class="badge bg-light text-dark">{{ product.get_category_display }}</span>
+        <span class="badge bg-info text-dark">{{ product.get_condition_display }}</span>
+        <span class="badge bg-light text-dark">{{ product.get_category_display }}</span>
 
         <p class="mt-3">{{ product.description }}</p>
 
@@ -67,7 +61,7 @@
 
         {% if user.is_authenticated %}
             {% if user != product.seller.user %}
-                 <a href="{% url 'marketplace:start_conversation' product.seller.pk %}" class="btn-pill-action btn-back">Message Seller</a>
+                 <a href="{% url 'marketplace:start_conversation' product.seller.pk %}" class="btn-pill-action">Message Seller</a>
             {% else %}
                 <p class="text-muted">This is your own listing.</p>
             {% endif %}
@@ -76,10 +70,8 @@
         {% endif %}
 
         <div class="mt-4">
-            <a href="{% url 'marketplace:home' %}" class="btn-pill-action btn-back" 
-            class="btn-back d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium shadow-sm" 
-            >
-                <span aria-hidden="true">&larr;</span> Back to all listings
+            <a href="{% url 'marketplace:home' %}" class="btn-pill-action btn-back">
+                <span class="icon arrow" aria-hidden="true">&larr;</span> Back to all listings
             </a>
         </div>
     </div>
