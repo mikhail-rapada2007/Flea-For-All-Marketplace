@@ -13,6 +13,7 @@ Follow these steps to set up the project on your own machine.
 
 ### 1. Clone the repository
 -> git clone https://github.com/mikhail-rapada2007/Flea-For-All-Marketplace.git
+
 -> cd Flea-For-All-Marketplace/flea_for_all
 
 
