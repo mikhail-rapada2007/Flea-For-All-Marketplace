@@ -1,11 +1,14 @@
 {% extends 'marketplace/base.html' %}
+
 {% block content %}
-  <h2 class="mb-4">Delete this FAQ?</h2>
-  <p><strong>{{ faq.question }}</strong></p>
-  <p>{{ faq.answer }}</p>
-  <form method="post">
+<div class="market-card p-4 mx-auto" style="max-width: 600px;">
+  <h2 class="text-white mb-4">Delete this FAQ?</h2>
+  <p class="text-white"><strong>{{ faq.question }}</strong></p>
+  <p class="text-white-50">{{ faq.answer }}</p>
+  <form method="post" class="mt-4">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Yes, delete</button>
-    <a href="{% url 'marketplace:store_detail' faq.store.pk %}" class="btn btn-secondary">Cancel</a>
+    <a href="{% url 'marketplace:store_detail' faq.store.pk %}" class="btn btn-secondary ms-2">Cancel</a>
   </form>
+</div>
 {% endblock %}
