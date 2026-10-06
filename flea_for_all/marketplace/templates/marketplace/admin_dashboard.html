@@ -1,0 +1,117 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Admin Dashboard</h1>
+    <hr>
+
+    <!-- SECTION 1: MANAGE USERS -->
+    <div class="users-section mb-5">
+        <h2>User Profiles</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Avatar</th>
+                    <th>Background</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in profiles %}
+                <tr>
+                    <td>
+                        {{ profile.user.username }} 
+                        {% if profile.user.is_staff %}(Admin){% endif %}
+                    </td>
+                    
+                    <!-- Show Avatar -->
+                    <td>
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" alt="Avatar" width="50">
+                        {% else %}
+                            <span class="text-muted">None</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Show Background -->
+                    <td>
+                        {% if profile.theme_background %}
+                            <img src="{{ profile.theme_background.url }}" alt="Bg" width="80">
+                        {% else %}
+                            <span class="text-muted">None</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- User Moderation Actions -->
+                    <td>
+                        {% if profile.profile_picture %}
+                            <a href="{% url 'marketplace:clear_profile_image' profile.id 'avatar' %}" 
+                               class="btn btn-sm btn-warning"
+                               onclick="return confirm('Remove avatar for {{ profile.user.username }}?');">
+                               Remove Avatar
+                            </a>
+                        {% endif %}
+                        
+                        {% if profile.theme_background %}
+                            <a href="{% url 'marketplace:clear_profile_image' profile.id 'background' %}" 
+                               class="btn btn-sm btn-warning"
+                               onclick="return confirm('Remove background for {{ profile.user.username }}?');">
+                               Remove Background
+                            </a>
+                        {% endif %}
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECTION 2: MANAGE LISTINGS -->
+    <div class="products-section">
+        <h2>Marketplace Listings</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Seller</th>
+                    <th>Status</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.seller.user.username }}</td>
+                    <td>{{ product.get_status_display }}</td>
+                    
+                    <!-- Show Product Image -->
+                    <td>
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="Product" width="60">
+                        {% else %}
+                            <span class="text-muted">No image</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Hard Delete Listing Button -->
+                    <td>
+                        <form action="{% url 'marketplace:delete_product' product.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('PERMANENTLY delete {{ product.title }}? This cannot be undone.');">
+                                Delete Listing
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

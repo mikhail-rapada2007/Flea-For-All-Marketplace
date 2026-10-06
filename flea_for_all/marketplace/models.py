@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+import os
 
 class Profile(models.Model):
 #User's profile acts as the 'store' page: bio + listings.
@@ -155,3 +158,10 @@ class Message(models.Model):
     class Meta:
         ordering = ["sent_at"]
 
+@receiver(post_delete, sender=Product)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    # Check if the product has an image
+    if instance.image:
+        # Check if the file actually exists on the server
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)

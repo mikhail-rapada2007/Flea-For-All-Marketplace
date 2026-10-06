@@ -54,7 +54,14 @@
 
           <div class="d-flex align-items-center gap-4">
               {% if user.is_authenticated %}
-                <span class="text-white-50 small fw-bold">Logged in as {{ user.username }}</span>
+              
+                <span class="text-white-50 small fw-bold">Logged in as <strong>{{ request.user.username }}</strong></span>
+
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <span class="admin-badge" style="background-color: #dc3545; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; vertical-align: middle;" title="Official Marketplace Admin">
+                        🛡️ Admin
+                    </span>
+                {% endif %}
                 
                 <form method="post" action="{% url 'logout' %}" class="d-inline m-0 p-0">
                   {% csrf_token %}

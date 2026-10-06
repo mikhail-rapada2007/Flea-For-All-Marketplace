@@ -29,4 +29,6 @@ urlpatterns = [
     path("product/<int:pk>/report/", views.report_product, name="report_product"),
     path("store/<int:pk>/report/", views.report_store, name="report_store"),
     path("verify-email/<uidb64>/<token>/", views.verify_email, name="verify_email"),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
     ]
