@@ -29,6 +29,19 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Store"
 
+    class LayoutStyle(models.TextChoices):
+        TABS = "TABS", "Classic Tabs"
+        SIDEBAR = "SIDEBAR", "Sidebar Split (Q&A + Reviews Right)"
+        FEED = "FEED", "Featured & Review Ticker"
+        BAZAAR = "BAZAAR", "Bazaar Showcase (Store Info Left)"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    layout_style = models.CharField(
+        max_length=20, 
+        choices=LayoutStyle.choices, 
+        default=LayoutStyle.TABS
+    )   
+
 
 class Product(models.Model):
 #A single listing. Status is controlled by the seller (User).
