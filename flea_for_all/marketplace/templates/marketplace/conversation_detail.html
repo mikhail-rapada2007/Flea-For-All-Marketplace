@@ -12,9 +12,17 @@
   </div>
 
   <div class="mb-4 d-flex flex-column gap-2">
-    {% for message in conversation.messages.all %}
+        {% for message in conversation.messages.all %}
       <div class="market-card p-3 {% if message.sender == request.user %}ms-auto text-end bg-market-brown{% else %}me-auto{% endif %}" style="max-width: 75%;">
-        <div class="fw-bold">{{ message.sender.username }}</div>
+                <div class="fw-bold">
+                    {{ message.sender.username }}
+                    {% if message.sender.is_staff or message.sender.is_superuser %}
+                        <span class="admin-badge" style="background-color: #dc3545; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; vertical-align: middle;" title="Official Marketplace Admin">
+                            🛡️ Admin
+                        </span>
+                    {% endif %}
+                </div>
+        
         <div class="my-1">{{ message.content }}</div>
         <div class="small text-white-50">{{ message.sent_at|date:"M d, g:i A" }}</div>
       </div>

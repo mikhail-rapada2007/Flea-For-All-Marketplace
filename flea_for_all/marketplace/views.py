@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.db.models import Avg
-from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm
-from .models import Profile, Product, Rating, FAQ, Conversation, Message
+from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm, ProductReportForm, StoreReportForm
+from .models import Profile, Product, Rating, FAQ, Conversation, Message, ProductReport, StoreReport
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -10,6 +10,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 def home(request):
@@ -271,10 +272,6 @@ def update_product_status(request, pk):
             product.save()
     return redirect("marketplace:product_detail", pk=product.pk)
 
-from django.contrib import messages
-from .forms import ProductReportForm, StoreReportForm
-from .models import ProductReport, StoreReport
-
 @login_required
 def report_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -307,3 +304,58 @@ def report_store(request, pk):
     else:
         form = StoreReportForm()
     return render(request, "marketplace/report_store.html", {"form": form, "store": store})
+
+
+
+@login_required
+def admin_dashboard(request):
+    if not request.user.is_staff:
+        messages.error(request, "You are not authorized to view the admin dashboard.")
+        return redirect('marketplace:home') 
+        
+    # Fetch all profiles and products for the admin to moderate
+    all_profiles = Profile.objects.all().order_by('-created_at')
+    all_products = Product.objects.all().order_by('-created_at')
+    
+    return render(request, 'marketplace/admin_dashboard.html', {
+        'profiles': all_profiles,
+        'products': all_products,
+    })
+
+
+@login_required
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    if request.user.is_staff or request.user.profile == product.seller:
+        product.delete()
+        messages.success(request, f"Listing '{product.title}' was successfully deleted.")
+    else:
+        messages.error(request, "You do not have permission to delete this listing.")
+        
+    if request.user.is_staff:
+        return redirect('marketplace:admin_dashboard')
+    else:
+
+        return redirect('marketplace:home') 
+    
+
+@login_required
+def clear_profile_image(request, profile_id, image_type):
+    if not request.user.is_staff:
+        messages.error(request, "Only admins can remove profile images.")
+        return redirect('marketplace:home') 
+        
+    profile = get_object_or_404(Profile, id=profile_id)
+    
+    if image_type == 'avatar' and profile.profile_picture:
+        profile.profile_picture.delete(save=True)
+        messages.success(request, f"Removed profile picture for {profile.user.username}.")
+        
+    elif image_type == 'background' and profile.theme_background:
+        profile.theme_background.delete(save=True)
+        messages.success(request, f"Removed theme background for {profile.user.username}.")
+    else:
+        messages.warning(request, "No image found to remove.")
+        
+    return redirect('marketplace:admin_dashboard')
