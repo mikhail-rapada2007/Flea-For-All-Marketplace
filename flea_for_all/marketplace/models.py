@@ -142,11 +142,17 @@ class FAQ(models.Model):
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(User, related_name="conversations")
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name="conversations")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
+
+    def get_other_user(self, current_user):
+        """Returns the participant that is not the current user."""
+        return self.participants.exclude(pk=current_user.pk).first()
+
+    def __str__(self):
+        return f"Conversation #{self.pk}"
 
 
 class Message(models.Model):
@@ -157,6 +163,9 @@ class Message(models.Model):
 
     class Meta:
         ordering = ["sent_at"]
+
+    def __str__(self):
+        return f"Message from {self.sender.username} at {self.sent_at}"
 
 @receiver(post_delete, sender=Product)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
