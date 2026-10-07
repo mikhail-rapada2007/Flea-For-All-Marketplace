@@ -30,27 +30,24 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav mx-auto mb-2 mb-md-0">
+        <ul class="navbar-nav mx-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'marketplace:home' %}">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'store_listings' %}active{% endif %}" href="{% url 'marketplace:store_listings' %}">STORES</a>
+          </li>
+          {% if user.is_authenticated and user.profile %}
             <li class="nav-item">
-              <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'marketplace:home' %}">HOME</a>
+              <a href="{% url 'marketplace:store_detail' user.profile.pk %}" class="nav-link {% if profile and user == profile.user %}active{% endif %}">MY STORE</a>
             </li>
+          {% endif %}
+          {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link {% if request.resolver_match.url_name == 'store_listings' %}active{% endif %}" href="{% url 'marketplace:store_listings' %}">STORES</a>
+              <a class="nav-link {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}" href="{% url 'marketplace:inbox' %}">INBOX</a>
             </li>
-            {% if user.is_authenticated and user.profile %}
-              <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'store_detail' %}active{% endif %}" 
-                  href="{% url 'marketplace:store_detail' user.profile.pk %}">MY STORE</a>
-              </li>
-            {% endif %}
-            {% if user.is_authenticated %}
-              <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}" 
-                   href="{% url 'marketplace:inbox' %}">MESSAGES</a>
-              </li>
-            {% endif %}
-          </ul>
+          {% endif %}
+        </ul>
 
           <div class="d-flex align-items-center gap-4">
               {% if user.is_authenticated %}

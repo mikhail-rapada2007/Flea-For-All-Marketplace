@@ -278,6 +278,35 @@ body {
   transform: rotate(90deg) scale(1.15);
 }
 
+/* Hero Action Buttons */
+.btn-hero-message {
+  background-color: #ffffff !important;
+  color: var(--card-brown) !important;
+  border: 1px solid #ffffff !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-message:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--card-brown) !important;
+  transform: translateY(-1px);
+}
+
+/* Red Report Button */
+.btn-hero-report {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-report:hover {
+  background-color: #bb2d3b !important;
+  border-color: #b02a37 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
 /* ==========================================================================
    6. Authentication & Django Form Elements
    ========================================================================== */
@@ -636,4 +665,297 @@ body {
     border-right: none;
     border-bottom: 1px solid rgba(82, 67, 54, 0.15);
   }
+}
+
+/* ==========================================================================
+   11. Store Profile Custom Layouts
+   ========================================================================== */
+
+/* Review Horizontal Carousel (Layout 2) */
+.reviews-horizontal-scroller {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  scroll-snap-type: x mandatory;
+}
+
+.reviews-horizontal-scroller::-webkit-scrollbar {
+  height: 6px;
+}
+
+.reviews-horizontal-scroller::-webkit-scrollbar-thumb {
+  background: rgba(82, 67, 54, 0.35);
+  border-radius: 10px;
+}
+
+.review-snap-card {
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+}
+
+/* Sidebar Cards Container */
+.sidebar-panel-box {
+  background-color: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(82, 67, 54, 0.15);
+  padding: 1.25rem;
+}
+
+/* Minimal Q&A / FAQ Item */
+.qa-item {
+  border-bottom: 1px solid rgba(82, 67, 54, 0.1);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.qa-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* New Arrivals Horizontal Carousel (Layout 2) */
+.new-items-carousel {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 0 1rem 0;
+  scroll-snap-type: x mandatory;
+}
+
+.new-items-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.new-items-carousel::-webkit-scrollbar-thumb {
+  background: rgba(82, 67, 54, 0.35);
+  border-radius: 10px;
+}
+
+.new-item-card {
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 1px solid rgba(82, 67, 54, 0.15);
+  box-shadow: 0 4px 15px rgba(82, 67, 54, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.new-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(82, 67, 54, 0.15);
+}
+
+.new-item-card img,
+.new-item-card .placeholder-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+/* Layout Selector Mini Wireframe Cards */
+.layout-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.layout-card-option {
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 0.6rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.layout-card-option:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.layout-card-option.active {
+  border-color: #4bb4e6;
+  background-color: rgba(75, 180, 230, 0.15);
+  box-shadow: 0 0 12px rgba(75, 180, 230, 0.35);
+}
+
+/* Micro Wireframe Canvas */
+.wireframe-box {
+  width: 100%;
+  height: 90px;
+  background-color: #dfd8cc;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 0.4rem;
+  pointer-events: none;
+}
+
+.wf-header {
+  height: 14px;
+  background-color: #634f40;
+  border-radius: 3px;
+  width: 100%;
+}
+
+.wf-row {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.wf-col {
+  background-color: #bfa795;
+  border-radius: 2px;
+}
+
+.wf-pill-bar {
+  height: 6px;
+  width: 70%;
+  background-color: #c7925e;
+  border-radius: 2px;
+}
+
+.wf-ticker {
+  height: 10px;
+  background-color: #d1b8a5;
+  border-radius: 2px;
+  width: 100%;
+}
+
+/* Color Presets */
+.preset-color-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.preset-color-badge:hover {
+  transform: scale(1.15);
+  border-color: #ffffff;
+}
+
+.preset-color-badge.active {
+  border-color: #4bb4e6;
+  box-shadow: 0 0 0 2px #4bb4e6;
+}
+
+/* Color Preset Circles */
+.preset-color-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preset-color-badge:hover {
+  transform: scale(1.15);
+  border-color: #ffffff;
+}
+
+.preset-color-badge.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px #4bb4e6;
+  transform: scale(1.1);
+}
+
+/* Custom Color Pill Trigger */
+.custom-color-trigger-pill {
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.custom-color-trigger-pill:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.custom-color-trigger-pill.active {
+  border-color: #4bb4e6;
+  box-shadow: 0 0 0 2px #4bb4e6;
+  background-color: rgba(75, 180, 230, 0.2);
+}
+
+.color-preview-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: inline-block;
+}
+
+.visually-hidden-color-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.modal-theme-dark {
+  background-color: #382c23 !important;
+  color: #fdfbf7;
+}
+
+.modal-theme-dark .modal-footer {
+  background-color: #2b221b !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: 90vh;
+}
+
+/* Fix Modal Viewport Height & Docked Footer */
+#editProfileModal .modal-dialog {
+  max-height: 90vh;
+  margin: 1.75rem auto;
+}
+
+#editProfileModal .modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #382c23;
+}
+
+#editProfileModal .modal-body {
+  overflow-y: auto !important;
+  max-height: calc(90vh - 130px);
+  padding: 1.25rem 1.5rem;
+}
+
+#editProfileModal .modal-footer {
+  flex-shrink: 0;
+  background-color: #2b221b;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+}
+
+/* Ensure Color Badges and Layout Cards are explicitly clickable */
+.layout-card-option,
+.preset-color-badge,
+.custom-color-trigger-pill {
+  cursor: pointer !important;
+  pointer-events: auto !important;
 }

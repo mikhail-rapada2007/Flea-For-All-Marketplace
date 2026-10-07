@@ -15,10 +15,25 @@ class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            "store_name", "bio", "profile_picture",
-            "city", "province",
-            'theme_background',
+            "layout_style",
+            "store_name",
+            "city",
+            "province",
+            "profile_picture",
+            "theme_background",
+            "theme_color",
+            "theme_font",
+            "bio",
         ]
+        widgets = {
+            "layout_style": forms.Select(attrs={"class": "form-select"}),
+            "theme_font": forms.Select(attrs={"class": "form-select"}),
+            "theme_color": forms.TextInput(attrs={"type": "color", "class": "form-control form-control-color w-100"}),
+            "store_name": forms.TextInput(attrs={"class": "form-control"}),
+            "city": forms.TextInput(attrs={"class": "form-control"}),
+            "province": forms.TextInput(attrs={"class": "form-control"}),
+            "bio": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+        }
 
 class FAQForm(forms.ModelForm):
     class Meta:
@@ -51,18 +66,19 @@ class ProductForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
-class ProfileEditForm(forms.ModelForm):
+class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'store_name',
-            'city',
-            'province',
-            'bio',
-            'profile_picture',
-            'theme_background',
-            'theme_color',
-            'theme_font',
+            "layout_style",
+            "store_name",
+            "bio",
+            "city",
+            "province",
+            "profile_picture",
+            "theme_background",
+            "theme_color",
+            "theme_font",
         ]
         widgets = {
             'store_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': "Your store's display name"}),
