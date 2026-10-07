@@ -182,8 +182,13 @@ class Message(models.Model):
 
 @receiver(post_delete, sender=Product)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
-    # Check if the product has an image
     if instance.image:
-        # Check if the file actually exists on the server
         if os.path.isfile(instance.image.path):
             os.remove(instance.image.path)
+
+@receiver(post_delete, sender=Profile)
+def auto_delete_profile_images_on_delete(sender, instance, **kwargs):
+    if instance.profile_picture and os.path.isfile(instance.profile_picture.path):
+        os.remove(instance.profile_picture.path)
+    if instance.theme_background and os.path.isfile(instance.theme_background.path):
+        os.remove(instance.theme_background.path)
