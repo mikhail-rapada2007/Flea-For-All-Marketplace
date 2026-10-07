@@ -75,16 +75,20 @@ Visit `http://127.0.0.1:8000/` in your browser. Admin panel is available at `htt
 
 ### Accounts
 - User signup, login, and logout (Django's built-in authentication)
+- Email Verification is implemented
 - Every new account automatically gets a linked Store/Profile
 
 ### Marketplace
 - Product listings with title, description, price, condition, and category
 - Category-based filtering
+- Search Bar system
 - Product status control (Available / Reserved / Sold), visible as color-coded badges site-wide
 - Detailed item view for each product
 
 ### Stores
 - Individual store pages for every user, showing their active listings
+- Every user can change the layout of their store
+- Uploadable Pictures for the profile picture, store banner, and items to be sold. 
 - Store FAQ (sellers can add their own frequently asked questions)
 - Store reviews with separate buyer and seller ratings
 - Verified store badge
@@ -95,16 +99,14 @@ Visit `http://127.0.0.1:8000/` in your browser. Admin panel is available at `htt
 
 ### Trust & Safety
 - Report system for both individual products and entire stores, with a defined set of report reasons
-- Reports reviewable through the Django admin panel
+- Reports reviewable through the admin dashboard
 
 ### Other
 - Terms and Services page
 
 ## Known Limitations
 
-- Uploaded images are stored locally only; cloud-based image storage is planned but not yet implemented
-- Store layout customization is not yet available
-- Email verification for login is not yet implemented
+- Uploaded images are stored locally only; cloud-based image storage is not implemented
 
 ## Team
 
