@@ -556,8 +556,8 @@
         {% endif %}
         {% for faq in faqs %}
           <div class="market-card p-3 mb-3">
-            <div class="fw-bold text-white">{{ faq.question }}</div>
-            <div class="text-white-50">{{ faq.answer }}</div>
+            <div class="fw-bold text-black">{{ faq.question }}</div>
+            <div class="text-black-50">{{ faq.answer }}</div>
             {% if request.user == profile.user %}
               <div class="mt-2">
                 <a href="{% url 'marketplace:edit_faq' faq.pk %}" class="btn btn-sm btn-outline-light">Edit</a>

@@ -2,6 +2,22 @@
 {% load static %}
 
 {% block content %}
+<!-- Search Bar Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <form method="GET" action="{% url 'marketplace:home' %}" class="d-flex gap-2 p-3 rounded shadow-sm" style="background-color: #533e2d;">
+            <input type="text" name="q" value="{{ search_query }}" class="form-control border-0" placeholder="Search for products..." style="background-color: #fdfbf7;">
+            
+            {% if selected_category %}
+                <input type="text" name="q" class="form-control border-0" placeholder="Search for products..." style="background-color: #fdfbf7;">
+            {% endif %}
+            
+            <button type="submit" class="btn text-white fw-semibold px-4" style="background-color: #3b2a1a;">Search</button>
+        </form>
+    </div>
+</div>
+
+{% if not search_query and not selected_category %}
   <!-- Top Showcase / Hero -->
   <section class="row g-3 mb-5">
     <div class="col-lg-6">
@@ -29,6 +45,7 @@
       </div>
     </div>
   </section>
+  {% endif %}
 
   <!-- Products Section Title -->
   <div class="d-flex justify-content-start mb-4">
