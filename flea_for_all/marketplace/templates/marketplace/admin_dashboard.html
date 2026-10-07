@@ -1,0 +1,264 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Admin Dashboard</h1>
+    <hr>
+
+    <!-- SECTION 1: MANAGE USERS -->
+    <div class="users-section mb-5">
+        <h2>User Profiles</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Avatar</th>
+                    <th>Background</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for profile in profiles %}
+                <tr>
+                    <td>
+                        {{ profile.user.username }}
+                        {% if profile.user.is_staff %}(Admin){% endif %}
+                    </td>
+
+                    <!-- Avatar column: preview + remove button -->
+                    <td>
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" alt="Avatar" width="50"><br>
+                            <form action="{% url 'marketplace:clear_profile_image' profile.id 'avatar' %}" method="POST" class="mt-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-warning"
+                                        onclick="return confirm('Remove avatar for {{ profile.user.username }}?');">
+                                    Remove Avatar
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted">None</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Background column: preview + remove button -->
+                    <td>
+                        {% if profile.theme_background %}
+                            <img src="{{ profile.theme_background.url }}" alt="Background" width="80"><br>
+                            <form action="{% url 'marketplace:clear_profile_image' profile.id 'background' %}" method="POST" class="mt-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-warning"
+                                        onclick="return confirm('Remove background for {{ profile.user.username }}?');">
+                                    Remove Background
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted">None</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Actions column: just user-level moderation -->
+                    <td>
+                        {% if not profile.user.is_staff and profile.user != request.user %}
+                        <form action="{% url 'marketplace:delete_user' profile.user.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('PERMANENTLY delete {{ profile.user.username }} and all their listings? This cannot be undone.');">
+                                Delete User
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                
+            </tbody>
+        </table>
+        
+        <!-- SECTION 2: WEB STATS -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="market-card p-3 text-center">
+                    <div class="fs-2 fw-bold text-white">{{ stats.total_users }}</div>
+                    <div class="text-white-50">Total Users</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="market-card p-3 text-center">
+                    <div class="fs-2 fw-bold text-white">{{ stats.total_listings }}</div>
+                    <div class="text-white-50">Total Listings</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="market-card p-3 text-center">
+                    <div class="fs-6 text-white">
+                        <span class="text-success">{{ stats.available_count }} Available</span> ·
+                        <span class="text-warning">{{ stats.reserved_count }} Reserved</span> ·
+                        <span class="text-danger">{{ stats.sold_count }} Sold</span>
+                    </div>
+                    <div class="text-white-50 mt-2">Listing Status</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="market-card p-3 text-center">
+                    <div class="fs-2 fw-bold {% if stats.pending_reports > 0 %}text-danger{% else %}text-white{% endif %}">{{ stats.pending_reports }}</div>
+                    <div class="text-white-50">Pending Reports</div>
+                </div>
+            </div>
+        </div>
+
+    <!-- SECTION 3: MANAGE LISTINGS -->
+    <div class="products-section">
+        <h2>Marketplace Listings</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Seller</th>
+                    <th>Status</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.seller.user.username }}</td>
+                    <td>{{ product.get_status_display }}</td>
+                    
+                    <!-- Show Product Image -->
+                    <td>
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="Product" width="60"><br>
+                            <form action="{% url 'marketplace:clear_product_image' product.id %}" method="POST" class="mt-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-warning"
+                                        onclick="return confirm('Remove image for {{ product.title }}?');">
+                                    Remove Image
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted">No image</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Hard Delete Listing Button -->
+                    <td>
+                        <form action="{% url 'marketplace:delete_product' product.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('PERMANENTLY delete the reported listing? This will also remove the report itself.');">
+                                Delete Listing
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SECTION 3: REVIEW REPORTS -->
+<div class="reports-section mt-5">
+    <h2>Product Reports</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Details</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in product_reports %}
+            <tr class="{% if not report.is_resolved %}table-warning{% endif %}">
+                <td><a href="{{ report.product.get_absolute_url }}">{{ report.product.title }}</a></td>
+                <td>{{ report.reporter.username|default:"Unknown" }}</td>
+                <td>{{ report.get_reason_display }}</td>
+                <td>{{ report.details|default:"—" }}</td>
+                <td>
+                    {% if report.is_resolved %}
+                        <span class="badge bg-success">Resolved</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not report.is_resolved %}
+                    <form action="{% url 'marketplace:mark_report_resolved' 'product' report.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">Mark Resolved</button>
+                    </form>
+                    {% endif %}
+                    <form action="{% url 'marketplace:delete_product' report.product.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('PERMANENTLY delete the reported listing? This will also remove the report itself.');">
+                            Delete Listing
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">No product reports.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2 class="mt-4">Store Reports</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Store</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Details</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in store_reports %}
+            <tr class="{% if not report.is_resolved %}table-warning{% endif %}">
+                <td><a href="{% url 'marketplace:store_detail' report.store.pk %}">{{ report.store.user.username }}</a></td>
+                <td>{{ report.reporter.username|default:"Unknown" }}</td>
+                <td>{{ report.get_reason_display }}</td>
+                <td>{{ report.details|default:"—" }}</td>
+                <td>
+                    {% if report.is_resolved %}
+                        <span class="badge bg-success">Resolved</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not report.is_resolved %}
+                    <form action="{% url 'marketplace:mark_report_resolved' 'store' report.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">Mark Resolved</button>
+                    </form>
+                    {% endif %}
+                    <form action="{% url 'marketplace:delete_user' report.store.user.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('PERMANENTLY delete the reported user and all their listings? This will also remove the report itself.');">
+                            Delete User
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">No store reports.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+import os
 
 class Profile(models.Model):
 #User's profile acts as the 'store' page: bio + listings.
@@ -25,6 +28,19 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Store"
+
+    class LayoutStyle(models.TextChoices):
+        TABS = "TABS", "Classic Tabs"
+        SIDEBAR = "SIDEBAR", "Sidebar Split (Q&A + Reviews Right)"
+        FEED = "FEED", "Featured & Review Ticker"
+        BAZAAR = "BAZAAR", "Bazaar Showcase (Store Info Left)"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    layout_style = models.CharField(
+        max_length=20, 
+        choices=LayoutStyle.choices, 
+        default=LayoutStyle.TABS
+    )   
 
 
 class Product(models.Model):
@@ -139,11 +155,17 @@ class FAQ(models.Model):
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(User, related_name="conversations")
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name="conversations")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
+
+    def get_other_user(self, current_user):
+        """Returns the participant that is not the current user."""
+        return self.participants.exclude(pk=current_user.pk).first()
+
+    def __str__(self):
+        return f"Conversation #{self.pk}"
 
 
 class Message(models.Model):
@@ -155,3 +177,18 @@ class Message(models.Model):
     class Meta:
         ordering = ["sent_at"]
 
+    def __str__(self):
+        return f"Message from {self.sender.username} at {self.sent_at}"
+
+@receiver(post_delete, sender=Product)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
+@receiver(post_delete, sender=Profile)
+def auto_delete_profile_images_on_delete(sender, instance, **kwargs):
+    if instance.profile_picture and os.path.isfile(instance.profile_picture.path):
+        os.remove(instance.profile_picture.path)
+    if instance.theme_background and os.path.isfile(instance.theme_background.path):
+        os.remove(instance.theme_background.path)

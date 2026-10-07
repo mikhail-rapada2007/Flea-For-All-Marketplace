@@ -1,8 +1,10 @@
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
+from django.db.models import Q, Avg
 from django.db.models import Avg
-from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm
-from .models import Profile, Product, Rating, FAQ, Conversation, Message
+from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm, ProductReportForm, StoreReportForm
+from .models import Profile, Product, Rating, FAQ, Conversation, Message, ProductReport, StoreReport
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -11,18 +13,28 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.http import Http404
-
+from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 def home(request):
     category_filter = request.GET.get("category")
+    search_query = request.GET.get("q", "")
     products = Product.objects.all()
     if category_filter:
         products = products.filter(category=category_filter)
-    
+
+    if search_query:
+        products = products.filter(
+            Q(title__icontains=search_query) | 
+            Q(description__icontains=search_query) | 
+            Q(category__icontains=search_query)
+        )
+
     return render(request, "marketplace/home.html", {
         "products": products,
         "selected_category": category_filter,
         "categories": Product.Category.choices,
+        "search_query": search_query,
     })
 
 @login_required
@@ -88,9 +100,34 @@ def close_chat(request, pk):
     return redirect(request.META.get("HTTP_REFERER", "marketplace:home"))
 
 @login_required
-def inbox(request):
-    conversations = request.user.conversations.all()
-    return render(request, "marketplace/inbox.html", {"conversations": conversations})
+def inbox(request, conversation_id=None):
+    # Fetch all user conversations ordered by created_at
+    conversations = list(Conversation.objects.filter(participants=request.user).order_by('-created_at'))
+
+    # Attach other participant safely
+    for convo in conversations:
+        convo.other_person = convo.get_other_user(request.user)
+
+    active_conversation = None
+    if conversation_id:
+        active_conversation = get_object_or_404(Conversation, pk=conversation_id, participants=request.user)
+        active_conversation.other_person = active_conversation.get_other_user(request.user)
+
+    # Handle sending messages directly in the active chat view
+    if request.method == "POST" and active_conversation:
+        content = request.POST.get("content", "").strip()
+        if content:
+            Message.objects.create(
+                conversation=active_conversation,
+                sender=request.user,
+                content=content
+            )
+            return redirect('marketplace:conversation_detail', conversation_id=active_conversation.pk)
+
+    return render(request, "marketplace/inbox.html", {
+        "conversations": conversations,
+        "active_conversation": active_conversation,
+    })
 
 @login_required
 def add_faq(request):
@@ -280,10 +317,6 @@ def update_product_status(request, pk):
             product.save()
     return redirect("marketplace:product_detail", pk=product.pk)
 
-from django.contrib import messages
-from .forms import ProductReportForm, StoreReportForm
-from .models import ProductReport, StoreReport
-
 @login_required
 def report_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -316,3 +349,154 @@ def report_store(request, pk):
     else:
         form = StoreReportForm()
     return render(request, "marketplace/report_store.html", {"form": form, "store": store})
+
+
+
+
+@login_required
+def admin_dashboard(request):
+    if not request.user.is_staff:
+        messages.error(request, "You are not authorized to view the admin dashboard.")
+        return redirect('marketplace:home')
+
+    all_profiles = Profile.objects.all().order_by('-created_at')
+    all_products = Product.objects.all().order_by('-created_at')
+
+    # Unresolved reports sort first automatically: False (0) sorts before True (1)
+    product_reports = ProductReport.objects.all().order_by('is_resolved', '-created_at')
+    store_reports = StoreReport.objects.all().order_by('is_resolved', '-created_at')
+
+    stats = {
+        'total_users': User.objects.count(),
+        'total_listings': Product.objects.count(),
+        'available_count': Product.objects.filter(status=Product.Status.AVAILABLE).count(),
+        'reserved_count': Product.objects.filter(status=Product.Status.RESERVED).count(),
+        'sold_count': Product.objects.filter(status=Product.Status.SOLD).count(),
+        'pending_reports': product_reports.filter(is_resolved=False).count() + store_reports.filter(is_resolved=False).count(),
+    }
+
+    return render(request, 'marketplace/admin_dashboard.html', {
+        'profiles': all_profiles,
+        'products': all_products,
+        'product_reports': product_reports,
+        'store_reports': store_reports,
+        'stats': stats,
+    })
+
+@require_POST
+@login_required
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    if request.user.is_staff or request.user.profile == product.seller:
+        product.delete()
+        messages.success(request, f"Listing '{product.title}' was successfully deleted.")
+    else:
+        messages.error(request, "You do not have permission to delete this listing.")
+        
+    if request.user.is_staff:
+        return redirect('marketplace:admin_dashboard')
+    else:
+
+        return redirect('marketplace:home') 
+    
+@require_POST
+@login_required
+def clear_profile_image(request, profile_id, image_type):
+    if not request.user.is_staff:
+        messages.error(request, "Only admins can remove profile images.")
+        return redirect('marketplace:home') 
+        
+    profile = get_object_or_404(Profile, id=profile_id)
+    
+    if image_type == 'avatar' and profile.profile_picture:
+        profile.profile_picture.delete(save=True)
+        messages.success(request, f"Removed profile picture for {profile.user.username}.")
+        
+    elif image_type == 'background' and profile.theme_background:
+        profile.theme_background.delete(save=True)
+        messages.success(request, f"Removed theme background for {profile.user.username}.")
+    else:
+        messages.warning(request, "No image found to remove.")
+        
+    return redirect('marketplace:admin_dashboard')
+
+@require_POST
+@login_required
+def delete_user(request, user_id):
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to delete users.")
+        return redirect('marketplace:home')
+
+    target_user = get_object_or_404(User, id=user_id)
+
+    if target_user == request.user:
+        messages.error(request, "You cannot delete your own account.")
+        return redirect('marketplace:admin_dashboard')
+
+    if target_user.is_staff:
+        messages.error(request, "You cannot delete another staff account from here.")
+        return redirect('marketplace:admin_dashboard')
+
+    username = target_user.username
+    target_user.delete()
+    messages.success(request, f"User '{username}' and all their data was permanently deleted.")
+    return redirect('marketplace:admin_dashboard')
+
+@require_POST
+@login_required
+def clear_product_image(request, product_id):
+    if not request.user.is_staff:
+        messages.error(request, "Only admins can remove product images.")
+        return redirect('marketplace:home')
+
+    product = get_object_or_404(Product, id=product_id)
+    if product.image:
+        product.image.delete(save=True)
+        messages.success(request, f"Removed image for '{product.title}'.")
+    else:
+        messages.warning(request, "No image found to remove.")
+
+    return redirect('marketplace:admin_dashboard')
+
+@login_required
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if not (request.user.is_staff or request.user.profile == product.seller):
+        messages.error(request, "You do not have permission to edit this listing.")
+        return redirect('marketplace:product_detail', pk=product.pk)
+
+    if request.method == "POST":
+        old_image = product.image
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            if 'image' in request.FILES and old_image and os.path.isfile(old_image.path):
+                os.remove(old_image.path)
+            form.save()
+            messages.success(request, f"'{product.title}' was updated.")
+            return redirect('marketplace:product_detail', pk=product.pk)
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, "marketplace/edit_product.html", {"form": form, "product": product})
+
+@require_POST
+@login_required
+def mark_report_resolved(request, report_type, report_id):
+    if not request.user.is_staff:
+        messages.error(request, "Only admins can resolve reports.")
+        return redirect('marketplace:home')
+
+    if report_type == 'product':
+        report = get_object_or_404(ProductReport, id=report_id)
+    elif report_type == 'store':
+        report = get_object_or_404(StoreReport, id=report_id)
+    else:
+        messages.error(request, "Invalid report type.")
+        return redirect('marketplace:admin_dashboard')
+
+    report.is_resolved = True
+    report.save()
+    messages.success(request, "Report marked as resolved.")
+    return redirect('marketplace:admin_dashboard')

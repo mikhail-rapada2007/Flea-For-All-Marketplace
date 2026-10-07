@@ -1,0 +1,961 @@
+/* ==========================================================================
+   1. Design Tokens & CSS Variables
+   ========================================================================== */
+:root {
+  --bg-col: #FAF5EB;
+  --card-brown: #524336;
+  --card-brown-hover: #43352A;
+  --accent-pink: #F1A3B8;
+  --accent-blue: #4BB4E6;
+  --font-main: 'Shrikhand', cursive, sans-serif;
+  --font-default: 'Montserrat', sans-serif;
+  --btn-bg: var(--card-brown);
+}
+
+/* ==========================================================================
+   2. Global Typography & Core Layout
+   ========================================================================== */
+body {
+  background-color: var(--bg-col);
+  font-family: var(--font-default);
+  color: var(--card-brown);
+}
+
+.bg-market-brown {
+  background-color: var(--card-brown) !important;
+}
+
+.brand-logo {
+  font-family: var(--font-main);
+  font-size: 2.25rem;
+  letter-spacing: 0.5px;
+}
+
+.footer-logo {
+  font-family: var(--font-main);
+  font-size: 3.25rem;
+  line-height: 1;
+}
+
+.footer-heading {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.section-badge {
+  display: inline-block;
+  background-color: var(--card-brown) !important;
+  color: #ffffff !important;
+  padding: 0.6rem 2.2rem;
+  border-radius: 14px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   3. Navigation & Nav Tabs
+   ========================================================================== */
+.nav-link {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.navbar .nav-link.active {
+  color: var(--accent-pink) !important;
+}
+
+.navbar .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: -4px;
+  left: -4px;
+  height: 4px;
+  background-color: var(--accent-blue);
+}
+
+/* Store Tabs Styling */
+.nav-tabs {
+  border-bottom: 2px solid rgba(82, 67, 54, 0.2);
+}
+
+.nav-tabs .nav-link {
+  color: var(--card-brown);
+  border: none;
+  background: transparent;
+  padding: 0.75rem 1.5rem;
+}
+
+.nav-tabs .nav-link:hover {
+  border: none;
+  color: var(--card-brown-hover);
+}
+
+.nav-tabs .nav-link.active {
+  color: #ffffff !important;
+  background-color: var(--card-brown) !important;
+  border-radius: 12px 12px 0 0;
+}
+
+.nav-tabs .nav-link.active::after {
+  display: none;
+}
+
+/* ==========================================================================
+   4. Cards & Showcase Displays
+   ========================================================================== */
+.market-card {
+  background-color: var(--card-brown);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 20px;
+  color: #ffffff;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.market-card.has-image {
+  background-image: linear-gradient(180deg, rgba(82, 67, 54, 0) 40%, rgba(50, 39, 31, 0.85) 100%);
+}
+
+.market-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(82, 67, 54, 0.25);
+  color: #ffffff;
+}
+
+.interactive-card {
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.hero-main {
+  min-height: 380px;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.hero-thumb {
+  min-height: 180px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 16px;
+}
+
+.product-box {
+  height: 340px;
+  cursor: pointer;
+}
+
+/* Store Hero */
+.store-hero {
+  border-radius: 16px;
+  position: relative;
+}
+
+/* Squircle Store Avatars */
+.store-avatar {
+  border-radius: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  object-fit: cover;
+}
+
+.store-avatar-placeholder {
+  border-radius: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.15), 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================================
+   5. Buttons & Action Links
+   ========================================================================== */
+.btn-market {
+  width: 100%;
+  background-color: var(--bg-col);
+  color: var(--card-brown);
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: none;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  margin-top: 0.5rem;
+}
+
+.btn-market:hover {
+  background-color: #ffffff;
+  transform: translateY(-2px);
+  color: var(--card-brown-hover);
+}
+
+.btn-pill-action {
+  --btn-bg: var(--card-brown);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  position: relative;
+  padding: 0.75rem 1.6rem;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  background-color: var(--btn-bg);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(82, 67, 54, 0.25);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-pill-action::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -100%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  transform: rotate(25deg);
+  transition: left 0.6s ease;
+}
+
+.btn-pill-action:hover::before {
+  left: 140%;
+}
+
+.btn-pill-action:hover {
+  color: #ffffff !important;
+  text-decoration: none !important;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(82, 67, 54, 0.4),
+              0 0 0 3px rgba(82, 67, 54, 0.15);
+}
+
+.btn-pill-action:active {
+  transform: translateY(-1px) scale(0.99);
+  box-shadow: 0 3px 8px rgba(82, 67, 54, 0.3);
+}
+
+.btn-pill-action .icon {
+  display: inline-block;
+  line-height: 1;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-back .arrow {
+  font-size: 1.15rem;
+}
+
+.btn-back:hover .arrow {
+  transform: translateX(-6px);
+}
+
+.btn-sell .plus {
+  font-size: 1.25rem;
+}
+
+.btn-sell:hover .plus {
+  transform: rotate(90deg) scale(1.15);
+}
+
+/* Hero Action Buttons */
+.btn-hero-message {
+  background-color: #ffffff !important;
+  color: var(--card-brown) !important;
+  border: 1px solid #ffffff !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-message:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--card-brown) !important;
+  transform: translateY(-1px);
+}
+
+/* Red Report Button */
+.btn-hero-report {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-report:hover {
+  background-color: #bb2d3b !important;
+  border-color: #b02a37 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   6. Authentication & Django Form Elements
+   ========================================================================== */
+.auth-card {
+  max-width: 500px;
+  margin: 2rem auto;
+  background-color: var(--card-brown);
+  border-radius: 22px;
+  padding: 2.75rem 2.25rem;
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(82, 67, 54, 0.15);
+}
+
+.auth-card label,
+.market-card label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  display: block;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+/* Universal text inputs for Django forms rendered via {{ form.as_p }} */
+.auth-card input[type="text"],
+.auth-card input[type="password"],
+.auth-card input[type="email"],
+.market-card input[type="text"],
+.market-card input[type="password"],
+.market-card input[type="email"],
+.market-card input[type="number"],
+.market-card textarea,
+.market-card select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-color: var(--bg-col);
+  color: var(--card-brown);
+  font-weight: 600;
+  font-family: var(--font-default);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-card input:focus,
+.market-card input:focus,
+.market-card textarea:focus,
+.market-card select:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(75, 180, 230, 0.25);
+}
+
+.auth-card p,
+.market-card form p {
+  margin-bottom: 1.25rem;
+}
+
+.auth-card .helptext,
+.market-card .helptext {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.35rem;
+  line-height: 1.3;
+}
+
+.auth-card ul.errorlist,
+.market-card ul.errorlist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem 0;
+  color: #ff8585;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.auth-footer a {
+  color: var(--accent-pink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   7. Modals & Modal Forms
+   ========================================================================== */
+.modal-content.modal-theme-dark {
+  background-color: var(--card-brown);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.modal-body a {
+  color: #ffd166;
+  word-break: break-all;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.modal-body input[type="checkbox"] {
+  margin-right: 6px;
+  accent-color: var(--card-brown);
+}
+
+#editProfileModal .modal-body a {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  display: inline-block;
+  max-width: 100%;
+  color: #8cc4ff;
+}
+
+#editProfileModal .modal-body input[type="checkbox"] {
+  margin-left: 4px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Input fields inside Bootstrap modal dialogs */
+.modal-body input[type="text"],
+.modal-body input[type="number"],
+.modal-body input[type="file"],
+.modal-body textarea,
+.modal-body select {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: var(--bg-col);
+  color: var(--card-brown);
+  font-family: var(--font-default);
+}
+
+.modal-body input[type="color"] {
+  height: 38px;
+  width: 50px;
+  padding: 2px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   8. Live Chat Widget
+   ========================================================================== */
+.chat-widgets-container {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 12px;
+  z-index: 1050;
+}
+
+.chat-widget {
+  width: 280px;
+  background: var(--bg-col);
+  border: 2px solid var(--card-brown);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.chat-avatar,
+.chat-avatar-placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #888888;
+}
+
+.chat-widget-messages {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.chat-widget.minimized .chat-widget-body {
+  display: none;
+}
+
+/* ==========================================================================
+   9. Terms & Informational Pages
+   ========================================================================== */
+.terms-card {
+  background-color: #fdfbf7;
+  border-radius: 16px;
+}
+
+.terms-badge {
+  background-color: var(--card-brown-hover);
+  color: #ffffff;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.terms-title {
+  font-family: var(--font-main);
+  color: var(--card-brown-hover);
+}
+
+.terms-divider {
+  border-top: 2px solid var(--card-brown-hover);
+  opacity: 0.5;
+}
+
+.terms-content {
+  color: #2c2c2c;
+  font-family: var(--font-default);
+}
+
+.terms-content h4 {
+  color: var(--card-brown-hover);
+}
+
+/* ==========================================================================
+   10. Messenger-Style Split View
+   ========================================================================== */
+
+   /* Messenger Split Container */
+.messenger-container {
+  display: flex;
+  height: 78vh;
+  min-height: 520px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(82, 67, 54, 0.12);
+  border: 1px solid rgba(82, 67, 54, 0.15);
+}
+
+.messenger-sidebar {
+  width: 340px;
+  border-right: 1px solid rgba(82, 67, 54, 0.15);
+  background-color: #fdfbf7;
+  display: flex;
+  flex-direction: column;
+}
+
+.messenger-sidebar-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(82, 67, 54, 0.1);
+}
+
+.messenger-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.messenger-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.25rem;
+  color: var(--card-brown);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(82, 67, 54, 0.05);
+  transition: background-color 0.15s ease;
+}
+
+.messenger-item:hover {
+  background-color: rgba(82, 67, 54, 0.06);
+  color: var(--card-brown);
+}
+
+.messenger-item.active {
+  background-color: rgba(82, 67, 54, 0.12);
+  font-weight: 700;
+}
+
+.messenger-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+.messenger-chat-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(82, 67, 54, 0.15);
+  background-color: #ffffff;
+}
+
+.messenger-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: #faf7f2;
+}
+
+.chat-bubble {
+  max-width: 65%;
+  padding: 0.65rem 1rem;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.chat-bubble.sent {
+  align-self: flex-end;
+  background-color: var(--card-brown);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-bubble.received {
+  align-self: flex-start;
+  background-color: #eae5dc;
+  color: var(--card-brown);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-bubble-time {
+  font-size: 0.72rem;
+  margin-top: 0.25rem;
+  opacity: 0.65;
+}
+
+.messenger-form {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(82, 67, 54, 0.15);
+  background-color: #ffffff;
+}
+
+.messenger-form input {
+  border-radius: 25px !important;
+  padding: 0.65rem 1.25rem;
+  background-color: var(--bg-col);
+  border: 1px solid rgba(82, 67, 54, 0.2);
+}
+
+.messenger-form input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(75, 180, 230, 0.2);
+}
+
+@media (max-width: 768px) {
+  .messenger-container {
+    flex-direction: column;
+    height: auto;
+  }
+  .messenger-sidebar {
+    width: 100%;
+    max-height: 250px;
+    border-right: none;
+    border-bottom: 1px solid rgba(82, 67, 54, 0.15);
+  }
+}
+
+/* ==========================================================================
+   11. Store Profile Custom Layouts
+   ========================================================================== */
+
+/* Review Horizontal Carousel (Layout 2) */
+.reviews-horizontal-scroller {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  scroll-snap-type: x mandatory;
+}
+
+.reviews-horizontal-scroller::-webkit-scrollbar {
+  height: 6px;
+}
+
+.reviews-horizontal-scroller::-webkit-scrollbar-thumb {
+  background: rgba(82, 67, 54, 0.35);
+  border-radius: 10px;
+}
+
+.review-snap-card {
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+}
+
+/* Sidebar Cards Container */
+.sidebar-panel-box {
+  background-color: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(82, 67, 54, 0.15);
+  padding: 1.25rem;
+}
+
+/* Minimal Q&A / FAQ Item */
+.qa-item {
+  border-bottom: 1px solid rgba(82, 67, 54, 0.1);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.qa-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* New Arrivals Horizontal Carousel (Layout 2) */
+.new-items-carousel {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 0 1rem 0;
+  scroll-snap-type: x mandatory;
+}
+
+.new-items-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.new-items-carousel::-webkit-scrollbar-thumb {
+  background: rgba(82, 67, 54, 0.35);
+  border-radius: 10px;
+}
+
+.new-item-card {
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 1px solid rgba(82, 67, 54, 0.15);
+  box-shadow: 0 4px 15px rgba(82, 67, 54, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.new-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(82, 67, 54, 0.15);
+}
+
+.new-item-card img,
+.new-item-card .placeholder-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+/* Layout Selector Mini Wireframe Cards */
+.layout-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.layout-card-option {
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 0.6rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.layout-card-option:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.layout-card-option.active {
+  border-color: #4bb4e6;
+  background-color: rgba(75, 180, 230, 0.15);
+  box-shadow: 0 0 12px rgba(75, 180, 230, 0.35);
+}
+
+/* Micro Wireframe Canvas */
+.wireframe-box {
+  width: 100%;
+  height: 90px;
+  background-color: #dfd8cc;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 0.4rem;
+  pointer-events: none;
+}
+
+.wf-header {
+  height: 14px;
+  background-color: #634f40;
+  border-radius: 3px;
+  width: 100%;
+}
+
+.wf-row {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.wf-col {
+  background-color: #bfa795;
+  border-radius: 2px;
+}
+
+.wf-pill-bar {
+  height: 6px;
+  width: 70%;
+  background-color: #c7925e;
+  border-radius: 2px;
+}
+
+.wf-ticker {
+  height: 10px;
+  background-color: #d1b8a5;
+  border-radius: 2px;
+  width: 100%;
+}
+
+/* Color Presets */
+.preset-color-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.preset-color-badge:hover {
+  transform: scale(1.15);
+  border-color: #ffffff;
+}
+
+.preset-color-badge.active {
+  border-color: #4bb4e6;
+  box-shadow: 0 0 0 2px #4bb4e6;
+}
+
+/* Color Preset Circles */
+.preset-color-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preset-color-badge:hover {
+  transform: scale(1.15);
+  border-color: #ffffff;
+}
+
+.preset-color-badge.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px #4bb4e6;
+  transform: scale(1.1);
+}
+
+/* Custom Color Pill Trigger */
+.custom-color-trigger-pill {
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.custom-color-trigger-pill:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.custom-color-trigger-pill.active {
+  border-color: #4bb4e6;
+  box-shadow: 0 0 0 2px #4bb4e6;
+  background-color: rgba(75, 180, 230, 0.2);
+}
+
+.color-preview-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: inline-block;
+}
+
+.visually-hidden-color-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.modal-theme-dark {
+  background-color: #382c23 !important;
+  color: #fdfbf7;
+}
+
+.modal-theme-dark .modal-footer {
+  background-color: #2b221b !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: 90vh;
+}
+
+/* Fix Modal Viewport Height & Docked Footer */
+#editProfileModal .modal-dialog {
+  max-height: 90vh;
+  margin: 1.75rem auto;
+}
+
+#editProfileModal .modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #382c23;
+}
+
+#editProfileModal .modal-body {
+  overflow-y: auto !important;
+  max-height: calc(90vh - 130px);
+  padding: 1.25rem 1.5rem;
+}
+
+#editProfileModal .modal-footer {
+  flex-shrink: 0;
+  background-color: #2b221b;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+}
+
+/* Ensure Color Badges and Layout Cards are explicitly clickable */
+.layout-card-option,
+.preset-color-badge,
+.custom-color-trigger-pill {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}

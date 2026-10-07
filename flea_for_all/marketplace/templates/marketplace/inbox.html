@@ -1,11 +1,152 @@
 {% extends 'marketplace/base.html' %}
+
+{% block title %}Messages - Flea For All Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Suppress bottom floating chat widget on the full messages screen */
+  .chat-widgets-container {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-  <h2 class="mb-4">Messages</h2>
-  {% for convo in conversations %}
-    <a href="{% url 'marketplace:conversation_detail' convo.pk %}" class="market-card p-3 mb-3 d-block text-decoration-none text-white">
-      Conversation from {{ convo.created_at|date:"M d, Y" }}
-    </a>
-  {% empty %}
-    <p>No conversations yet.</p>
-  {% endfor %}
+<div class="messenger-container">
+
+  <!-- Left: Sidebar Conversation List -->
+  <aside class="messenger-sidebar">
+    <div class="messenger-sidebar-header">
+      <h4 class="fw-bold mb-0" style="font-family: var(--font-main); color: var(--card-brown);">Chats</h4>
+    </div>
+
+    <div class="messenger-list">
+      {% for convo in conversations %}
+        <a href="{% url 'marketplace:conversation_detail' convo.pk %}" 
+           class="messenger-item {% if active_conversation and active_conversation.pk == convo.pk %}active{% endif %}">
+          
+          <!-- Store Avatar: Custom Photo OR Theme Color Squircle -->
+          {% if convo.other_person and convo.other_person.profile and convo.other_person.profile.profile_picture %}
+            <img src="{{ convo.other_person.profile.profile_picture.url }}" 
+                 alt="" 
+                 class="object-fit-cover flex-shrink-0 shadow-sm" 
+                 style="width: 44px; height: 44px; border-radius: 14px; border: 2px solid rgba(255, 255, 255, 0.3);">
+          {% else %}
+            <div class="flex-shrink-0 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm user-select-none" 
+                 style="width: 44px; height: 44px; border-radius: 14px; background-color: {{ convo.other_person.profile.theme_color|default:'var(--card-brown)' }}; border: 2px solid rgba(255, 255, 255, 0.3); font-size: 1.15rem; box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.12);">
+              {% if convo.other_person and convo.other_person.profile and convo.other_person.profile.store_name %}
+                {{ convo.other_person.profile.store_name|slice:":1"|upper }}
+              {% elif convo.other_person %}
+                {{ convo.other_person.username|slice:":1"|upper }}
+              {% else %}
+                #
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <div class="overflow-hidden flex-grow-1">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-truncate fw-bold">
+                {% if convo.other_person and convo.other_person.profile and convo.other_person.profile.store_name %}
+                  {{ convo.other_person.profile.store_name }}
+                {% elif convo.other_person %}
+                  {{ convo.other_person.username }}
+                {% else %}
+                  Conversation #{{ convo.pk }}
+                {% endif %}
+              </span>
+            </div>
+            <div class="small text-muted text-truncate">
+              {{ convo.messages.last.content|default:"No messages yet" }}
+            </div>
+          </div>
+        </a>
+      {% empty %}
+        <div class="p-4 text-center text-muted">
+          No conversations found.
+        </div>
+      {% endfor %}
+    </div>
+  </aside>
+
+  <!-- Right: Active Chat Conversation -->
+  <section class="messenger-chat">
+    {% if active_conversation %}
+      <!-- Chat Header -->
+      <div class="messenger-chat-header d-flex align-items-center gap-3">
+        {% if active_conversation.other_person and active_conversation.other_person.profile and active_conversation.other_person.profile.profile_picture %}
+          <img src="{{ active_conversation.other_person.profile.profile_picture.url }}" 
+               alt="" 
+               class="object-fit-cover shadow-sm" 
+               style="width: 42px; height: 42px; border-radius: 14px; border: 2px solid rgba(255, 255, 255, 0.3);">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center text-white fw-bold shadow-sm user-select-none" 
+               style="width: 42px; height: 42px; border-radius: 14px; background-color: {{ active_conversation.other_person.profile.theme_color|default:'var(--card-brown)' }}; border: 2px solid rgba(255, 255, 255, 0.3); font-size: 1.15rem; box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.12);">
+            {% if active_conversation.other_person and active_conversation.other_person.profile and active_conversation.other_person.profile.store_name %}
+              {{ active_conversation.other_person.profile.store_name|slice:":1"|upper }}
+            {% elif active_conversation.other_person %}
+              {{ active_conversation.other_person.username|slice:":1"|upper }}
+            {% else %}
+              #
+            {% endif %}
+          </div>
+        {% endif %}
+        <div>
+          <h6 class="fw-bold mb-0">
+            {% if active_conversation.other_person and active_conversation.other_person.profile and active_conversation.other_person.profile.store_name %}
+              {{ active_conversation.other_person.profile.store_name }}
+            {% elif active_conversation.other_person %}
+              {{ active_conversation.other_person.username }}
+            {% else %}
+              Conversation #{{ active_conversation.pk }}
+            {% endif %}
+          </h6>
+          {% if active_conversation.other_person and active_conversation.other_person.profile %}
+            <a href="{% url 'marketplace:store_detail' active_conversation.other_person.profile.pk %}" class="small text-muted text-decoration-none">
+              Visit Store &rarr;
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Message History -->
+      <div class="messenger-messages" id="messagesList">
+        {% for message in active_conversation.messages.all %}
+          <div class="chat-bubble {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+            <div>{{ message.content }}</div>
+            <div class="chat-bubble-time {% if message.sender == request.user %}text-white-50 text-end{% else %}text-muted{% endif %}">
+              {{ message.sent_at|date:"g:i A" }}
+            </div>
+          </div>
+        {% empty %}
+          <div class="m-auto text-muted">Say hello to start the conversation!</div>
+        {% endfor %}
+      </div>
+
+      <!-- Message Form -->
+      <form method="post" action="{% url 'marketplace:conversation_detail' active_conversation.pk %}" class="messenger-form">
+        {% csrf_token %}
+        <div class="input-group">
+          <input type="text" name="content" class="form-control" placeholder="Type a message..." required autocomplete="off">
+          <button type="submit" class="btn btn-pill-action ms-2 px-4 border-0">Send</button>
+        </div>
+      </form>
+
+    {% else %}
+      <div class="m-auto text-center p-4">
+        <i class="bi bi-chat-dots display-3 text-muted"></i>
+        <h5 class="fw-bold mt-3 text-secondary">Your Messages</h5>
+        <p class="text-muted">Select a chat from the left sidebar to start messaging.</p>
+      </div>
+    {% endif %}
+  </section>
+
+</div>
+
+<script>
+  const container = document.getElementById("messagesList");
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+</script>
 {% endblock %}
