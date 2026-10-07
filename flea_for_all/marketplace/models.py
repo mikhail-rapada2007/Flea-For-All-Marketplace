@@ -6,8 +6,7 @@ from django.dispatch import receiver
 import os
 
 class Profile(models.Model):
-#User's profile acts as the 'store' page: bio + listings.
-
+    # User's profile acts as the 'store' page: bio + listings.
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to="profiles/avatars/", blank=True, null=True)
@@ -20,14 +19,14 @@ class Profile(models.Model):
 
     class ThemeFont(models.TextChoices):
         DEFAULT = "DEFAULT", "Default"
-        MONTSERRAT = "MONTSERRAT", "Montserrat"
         SHRIKHAND = "SHRIKHAND", "Shrikhand"
+        POPPINS = "POPPINS", "Poppins"
+        PLAYFAIR = "PLAYFAIR", "Playfair Display"
+        COMFORTAA = "COMFORTAA", "Comfortaa"
+        PACIFICO = "PACIFICO", "Pacifico"
 
     theme_font = models.CharField(max_length=20, choices=ThemeFont.choices, default=ThemeFont.DEFAULT)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user.username}'s Store"
 
     class LayoutStyle(models.TextChoices):
         TABS = "TABS", "Classic Tabs"
@@ -35,12 +34,14 @@ class Profile(models.Model):
         FEED = "FEED", "Featured & Review Ticker"
         BAZAAR = "BAZAAR", "Bazaar Showcase (Store Info Left)"
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     layout_style = models.CharField(
-        max_length=20, 
-        choices=LayoutStyle.choices, 
+        max_length=20,
+        choices=LayoutStyle.choices,
         default=LayoutStyle.TABS
-    )   
+    )
+
+    def __str__(self):
+        return f"{self.user.username}'s Store"
 
 
 class Product(models.Model):
