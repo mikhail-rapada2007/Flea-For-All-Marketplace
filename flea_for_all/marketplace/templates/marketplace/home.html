@@ -3,6 +3,8 @@
 
 {% block content %}
 <!-- Search Bar Section -->
+
+{% if user.is_authenticated %}
 <div class="row mb-4">
     <div class="col-12">
         <form method="GET" action="{% url 'marketplace:home' %}" class="d-flex gap-2 p-3 rounded shadow-sm" style="background-color: #533e2d;">
@@ -16,6 +18,7 @@
         </form>
     </div>
 </div>
+{% endif %}
 
 {% if not search_query and not selected_category %}
   <!-- Top Showcase / Hero -->
