@@ -19,35 +19,41 @@ from django.views.decorators.http import require_POST
 def home(request):
     category_filter = request.GET.get("category")
     search_query = request.GET.get("q", "")
-    products = Product.objects.all()
+    
+    # 1. Latest 4 items site-wide (or .filter(status=Product.Status.AVAILABLE) if you want only unsold items)
+    featured_items = Product.objects.all().order_by("-created_at")[:4]
+
+    # 2. Main products listing with search and category filters preserved
+    products = Product.objects.all().order_by("-created_at")
     if category_filter:
         products = products.filter(category=category_filter)
 
     if search_query:
         products = products.filter(
-            Q(title__icontains=search_query) | 
-            Q(description__icontains=search_query) | 
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
             Q(category__icontains=search_query)
         )
 
     return render(request, "marketplace/home.html", {
+        "featured_items": featured_items,
         "products": products,
         "selected_category": category_filter,
         "categories": Product.Category.choices,
         "search_query": search_query,
     })
 
-@login_required
 def edit_profile(request):
     profile = request.user.profile
     if request.method == "POST":
-        form = ProfileEditForm(request.POST, instance=profile)
+        form = ProfileEditForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
             return redirect("marketplace:store_detail", pk=profile.pk)
-    else:
-        form = ProfileEditForm(instance=profile)
-    return render(request, "marketplace/edit_profile.html", {"form": form})
+        else:
+            # If validation fails, print errors to the console to diagnose
+            print("Profile Form Errors:", form.errors)
+    return redirect("marketplace:store_detail", pk=profile.pk)
 
 @login_required
 def conversation_detail(request, pk):

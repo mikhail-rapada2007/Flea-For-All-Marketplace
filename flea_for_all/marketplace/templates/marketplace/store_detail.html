@@ -2,7 +2,10 @@
   {% load static %}
 
   {% block content %}
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Shrikhand&display=swap" rel="stylesheet">
+  
   <style>
     /* 1. Full-page dynamic theme tokens derived from the store profile's color */
     :root {
@@ -164,6 +167,49 @@
       border-color: var(--store-theme) !important;
       color: #ffffff !important;
     }
+
+    /* 1. Map your model's exact choices to font-family */
+    {% if profile.theme_font == 'SHRIKHAND' %}
+      :root { --store-font: 'Shrikhand', cursive; }
+    {% elif profile.theme_font == 'MONTSERRAT' %}
+      :root { --store-font: 'Montserrat', sans-serif; }
+    {% elif profile.theme_font == 'POPPINS' %}
+      :root { --store-font: 'Poppins', sans-serif; }
+    {% elif profile.theme_font == 'PLAYFAIR' %}
+      :root { --store-font: 'Playfair Display', serif; }
+    {% elif profile.theme_font == 'COMFORTAA' %}
+      :root { --store-font: 'Comfortaa', cursive; }
+    {% elif profile.theme_font == 'PACIFICO' %}
+      :root { --store-font: 'Pacifico', cursive; }
+    {% else %}
+      :root { --store-font: inherit; }
+    {% endif %}
+
+  /* 2. Apply font to store elements */
+  .store-theme-scope,
+  .store-hero,
+  .store-hero h1,
+  .store-hero div.fs-2,
+  .product-box,
+  .section-badge,
+  .nav-tabs .nav-link,
+  .sidebar-panel-box h5,
+  .display-5 {
+    font-family: var(--store-font) !important;
+  }
+
+  /* 3. Fix the dropdown options visibility in the modal */
+  #editProfileModal select {
+    background-color: #2b231d !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  #editProfileModal select option {
+    background-color: #2b231d !important;
+    color: #ffffff !important;
+    padding: 8px 12px;
+  }
   </style>
 
   <div>
@@ -320,8 +366,7 @@
     <div class="mb-4">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <div class="d-flex align-items-center gap-2">
-          <span class="fw-bold" style="font-family: var(--font-main); color: var(--card-brown); font-size: 1.2rem;">REV</span>
-          <span class="text-muted small">&rarr; &rarr; &rarr;</span>
+          <span class="fw-bold" style="font-family: var(--font-main); color: var(--card-brown); font-size: 1.2rem;">REVIEWS</span>
         </div>
         {% if request.user.is_authenticated and request.user != profile.user %}
           <a href="{% url 'marketplace:add_review' profile.pk %}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold">+ Review</a>
@@ -774,52 +819,78 @@
     </div>
   </div>
 
-  <script>
-    function selectStoreLayout(val, elem) {
-      document.querySelectorAll(".layout-card-option").forEach(c => c.classList.remove("active"));
-      elem.classList.add("active");
-      const input = document.querySelector('select[name="layout_style"]') || document.getElementById('id_layout_style');
-      if (input) input.value = val;
-    }
+<script>
+      function selectStoreLayout(val, elem) {
+        document.querySelectorAll(".layout-card-option").forEach(c => c.classList.remove("active"));
+        if (elem) elem.classList.add("active");
+        
+        // Target Django's layout field
+        const field = document.querySelector('[name="layout_style"]');
+        if (field) field.value = val;
+      }
 
-function selectStoreColor(hex, elem) {
-    document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
-    const customPill = document.querySelector(".custom-color-trigger-pill");
-    if (customPill) customPill.classList.remove("active");
-    if (elem) elem.classList.add("active");
+      function applyColorLive(hex) {
+        // Update live CSS variables
+        document.documentElement.style.setProperty('--card-brown', hex);
+        document.documentElement.style.setProperty('--store-theme', hex);
+        document.documentElement.style.setProperty('--bg-col', hex);
 
-    const colorInput = document.getElementById("id_theme_color");
-    const preview = document.getElementById("customColorCircle");
-    if (colorInput) colorInput.value = hex;
-    if (preview) preview.style.backgroundColor = hex;
+        // Update Django's real bound form field
+        const djangoField = document.querySelector('[name="theme_color"]');
+        if (djangoField) djangoField.value = hex;
 
-    // Dynamically update the modal highlights live
-    document.documentElement.style.setProperty('--store-theme', hex);
-    document.querySelectorAll('.modal-title').forEach(t => t.style.color = hex);
-    const activeLayout = document.querySelector('.layout-card-option.active');
-    if (activeLayout) activeLayout.style.borderColor = hex;
-  }
+        // Update preview circle & modal accents
+        const preview = document.getElementById("customColorCircle");
+        if (preview) preview.style.backgroundColor = hex;
 
-  document.addEventListener("DOMContentLoaded", function() {
-    const colorInput = document.getElementById("id_theme_color");
-    const preview = document.getElementById("customColorCircle");
-    const customPill = document.querySelector(".custom-color-trigger-pill");
-
-    if (colorInput) {
-      colorInput.addEventListener("input", function() {
-        document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
-        if (customPill) customPill.classList.add("active");
-        if (preview) preview.style.backgroundColor = this.value;
-
-        // Dynamically update the modal highlights live on picker drag
-        document.documentElement.style.setProperty('--store-theme', this.value);
-        document.querySelectorAll('.modal-title').forEach(t => t.style.color = this.value);
+        document.querySelectorAll('#editProfileModal .modal-title, #sellModal .modal-title').forEach(t => t.style.color = hex);
         const activeLayout = document.querySelector('.layout-card-option.active');
-        if (activeLayout) activeLayout.style.borderColor = this.value;
+        if (activeLayout) activeLayout.style.borderColor = hex;
+      }
+
+      function selectStoreColor(hex, elem) {
+        document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
+        const customPill = document.querySelector(".custom-color-trigger-pill");
+        if (customPill) customPill.classList.remove("active");
+        if (elem) elem.classList.add("active");
+
+        const nativePicker = document.getElementById("nativeColorPicker");
+        if (nativePicker) nativePicker.value = hex;
+
+        applyColorLive(hex);
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const nativePicker = document.getElementById("nativeColorPicker");
+        const customPill = document.querySelector(".custom-color-trigger-pill");
+
+        if (nativePicker) {
+          nativePicker.addEventListener("input", function() {
+            document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
+            if (customPill) customPill.classList.add("active");
+            applyColorLive(this.value);
+          });
+        }
+
+        const fontSelect = document.querySelector('select[name="theme_font"]');
+        const fontMap = {
+          'SHRIKHAND': "'Shrikhand', cursive",
+          'MONTSERRAT': "'Montserrat', sans-serif",
+          'POPPINS': "'Poppins', sans-serif",
+          'PLAYFAIR': "'Playfair Display', serif",
+          'COMFORTAA': "'Comfortaa', cursive",
+          'PACIFICO': "'Pacifico', cursive",
+          'DEFAULT': "inherit"
+        };
+
+        if (fontSelect) {
+          fontSelect.addEventListener("change", function() {
+            const chosen = fontMap[this.value] || 'inherit';
+            document.documentElement.style.setProperty('--store-font', chosen);
+          });
+        }
       });
-    }
-  });
-  </script>
+    </script>
   {% endif %}
 
   {% endblock %}
