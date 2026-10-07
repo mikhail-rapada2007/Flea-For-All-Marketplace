@@ -40,17 +40,31 @@ python -m pip install -r requirements.txt
 > Note: always use `python -m pip` rather than a bare `pip` command — on some systems, `pip` alone can silently point to a different Python installation than the one your venv actually uses.
 
 
-### 4. Apply database migrations
+### 4. Set up environment variables
+
+Duplicate the `.env.example` and rename it as a new file named `.env` in the project root.
+
+Open `.env` and fill in the values:
+`SECRET_KEY=your-generated-secret-key-here`
+`DEBUG=True`
+`ALLOWED_HOSTS=127.0.0.1,localhost`
+
+To generate a SECRET_KEY, run:
+`python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`
+
+
+### 5. Apply database migrations
 
 python manage.py migrate
 
 
-### 5. Create a superuser (for admin panel access)
+### 6. Create a superuser (for admin panel access)
 
 python manage.py createsuperuser
 
 
-### 6. Run the development server
+
+### 7. Run the development server
 
 python manage.py runserver
 
