@@ -45,12 +45,16 @@ python -m pip install -r requirements.txt
 Duplicate the `.env.example` and rename it as a new file named `.env` in the project root.
 
 Open `.env` and fill in the values:
-`SECRET_KEY=your-generated-secret-key-here`
-`DEBUG=True`
-`ALLOWED_HOSTS=127.0.0.1,localhost`
+`EMAIL_HOST_USER = email_here`
+`EMAIL_HOST_PASSWORD = password_here`
+`SECRET_KEY = secret_key_here`
+`DEBUG = True`
+`ALLOWED_HOSTS = 127.0.0.1, localhost`
 
 To generate a SECRET_KEY, run:
 `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`
+
+To obtain the host email and password, please email the members of the group.
 
 
 ### 5. Apply database migrations
@@ -61,7 +65,6 @@ python manage.py migrate
 ### 6. Create a superuser (for admin panel access)
 
 python manage.py createsuperuser
-
 
 
 ### 7. Run the development server
