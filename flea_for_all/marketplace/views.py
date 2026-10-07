@@ -1,6 +1,7 @@
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
+from django.db.models import Q, Avg
 from django.db.models import Avg
 from .forms import SignUpForm, ProfileEditForm, FAQForm, RatingForm, ProductForm, ProductForm, ProductReportForm, StoreReportForm
 from .models import Profile, Product, Rating, FAQ, Conversation, Message, ProductReport, StoreReport
@@ -16,14 +17,23 @@ from django.views.decorators.http import require_POST
 
 def home(request):
     category_filter = request.GET.get("category")
+    search_query = request.GET.get("q", "")
     products = Product.objects.all()
     if category_filter:
         products = products.filter(category=category_filter)
-    
+
+    if search_query:
+        products = products.filter(
+            Q(title__icontains=search_query) | 
+            Q(description__icontains=search_query) | 
+            Q(category__icontains=search_query)
+        )
+
     return render(request, "marketplace/home.html", {
         "products": products,
         "selected_category": category_filter,
         "categories": Product.Category.choices,
+        "search_query": search_query,
     })
 
 @login_required
