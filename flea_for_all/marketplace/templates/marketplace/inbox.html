@@ -54,6 +54,11 @@
                 {% else %}
                   Conversation #{{ convo.pk }}
                 {% endif %}
+                {% if convo.other_person and convo.other_person.is_staff or convo.other_person and convo.other_person.is_superuser %}
+                  <span class="admin-badge" style="background-color: #dc3545; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; vertical-align: middle;" title="Official Marketplace Admin">
+                    🛡️ Admin
+                  </span>
+                {% endif %}
               </span>
             </div>
             <div class="small text-muted text-truncate">
@@ -99,6 +104,11 @@
               {{ active_conversation.other_person.username }}
             {% else %}
               Conversation #{{ active_conversation.pk }}
+            {% endif %}
+            {% if active_conversation.other_person and active_conversation.other_person.is_staff or active_conversation.other_person and active_conversation.other_person.is_superuser %}
+              <span class="admin-badge" style="background-color: #dc3545; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; vertical-align: middle;" title="Official Marketplace Admin">
+                🛡️ Admin
+              </span>
             {% endif %}
           </h6>
           {% if active_conversation.other_person and active_conversation.other_person.profile %}
