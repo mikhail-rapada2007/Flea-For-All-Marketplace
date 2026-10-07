@@ -124,31 +124,45 @@
       background-color: var(--card-tint) !important;
     }
 
-    /* Modal viewport and scroll behavior */
-    #editProfileModal .modal-dialog,
-    #sellModal .modal-dialog {
-      max-height: 90vh;
-      margin: 1.75rem auto;
+  /* Modal Title matches the store theme */
+    #editProfileModal .modal-title,
+    #sellModal .modal-title {
+      color: var(--store-theme) !important;
     }
 
-    #editProfileModal .modal-content,
-    #sellModal .modal-content {
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    /* Active Layout Card Border & Highlight matches the store theme */
+    .layout-card-option.active {
+      border-color: var(--store-theme) !important;
+      box-shadow: 0 0 0 2px var(--store-theme), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
     }
 
-    #editProfileModal .modal-body,
-    #sellModal .modal-body {
-      overflow-y: auto !important;
-      max-height: calc(90vh - 130px);
-      padding: 1.25rem 1.5rem;
+    /* Custom Color Trigger Pill Active State */
+    .custom-color-trigger-pill.active {
+      border-color: var(--store-theme) !important;
+      box-shadow: 0 0 0 2px var(--store-theme) !important;
     }
 
-    #editProfileModal .modal-footer,
-    #sellModal .modal-footer {
-      flex-shrink: 0;
+    /* Modal Form Inputs text color & focus rings */
+    #editProfileModal input,
+    #editProfileModal select,
+    #editProfileModal textarea {
+      color: var(--store-text) !important;
+      background-color: var(--store-bg) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+
+    #editProfileModal input:focus,
+    #editProfileModal select:focus,
+    #editProfileModal textarea:focus {
+      border-color: var(--store-theme) !important;
+      box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--store-theme) 25%, transparent) !important;
+    }
+
+    /* Save button in modal */
+    #editProfileModal .modal-footer .btn-pill-action {
+      background-color: var(--store-theme) !important;
+      border-color: var(--store-theme) !important;
+      color: #ffffff !important;
     }
   </style>
 
@@ -200,8 +214,8 @@
 
         <div class="d-flex align-items-center gap-2" onclick="event.stopPropagation();">
           {% if request.user.is_authenticated and request.user != profile.user %}
-            <a href="{% url 'marketplace:start_conversation' profile.pk %}" class="btn btn-primary">Message Seller</a>
-            <a href="{% url 'marketplace:report_store' profile.pk %}" class="btn btn-outline-danger btn-sm">Report Store</a>
+            <a href="{% url 'marketplace:start_conversation' profile.pk %}" class="btn btn-hero-message fw-bold px-3 py-2 rounded-pill shadow-sm">Message Seller</a>
+            <a href="{% url 'marketplace:report_store' profile.pk %}" class="btn btn-hero-report btn-sm fw-semibold rounded-pill px-3 py-2 shadow-sm">Report Store</a>
           {% endif %}
 
           {% if user.is_authenticated and user == profile.user %}
@@ -768,31 +782,43 @@
       if (input) input.value = val;
     }
 
-    function selectStoreColor(hex, elem) {
-      document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
-      const customPill = document.querySelector(".custom-color-trigger-pill");
-      if (customPill) customPill.classList.remove("active");
-      if (elem) elem.classList.add("active");
+function selectStoreColor(hex, elem) {
+    document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
+    const customPill = document.querySelector(".custom-color-trigger-pill");
+    if (customPill) customPill.classList.remove("active");
+    if (elem) elem.classList.add("active");
 
-      const colorInput = document.getElementById("id_theme_color");
-      const preview = document.getElementById("customColorCircle");
-      if (colorInput) colorInput.value = hex;
-      if (preview) preview.style.backgroundColor = hex;
+    const colorInput = document.getElementById("id_theme_color");
+    const preview = document.getElementById("customColorCircle");
+    if (colorInput) colorInput.value = hex;
+    if (preview) preview.style.backgroundColor = hex;
+
+    // Dynamically update the modal highlights live
+    document.documentElement.style.setProperty('--store-theme', hex);
+    document.querySelectorAll('.modal-title').forEach(t => t.style.color = hex);
+    const activeLayout = document.querySelector('.layout-card-option.active');
+    if (activeLayout) activeLayout.style.borderColor = hex;
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const colorInput = document.getElementById("id_theme_color");
+    const preview = document.getElementById("customColorCircle");
+    const customPill = document.querySelector(".custom-color-trigger-pill");
+
+    if (colorInput) {
+      colorInput.addEventListener("input", function() {
+        document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
+        if (customPill) customPill.classList.add("active");
+        if (preview) preview.style.backgroundColor = this.value;
+
+        // Dynamically update the modal highlights live on picker drag
+        document.documentElement.style.setProperty('--store-theme', this.value);
+        document.querySelectorAll('.modal-title').forEach(t => t.style.color = this.value);
+        const activeLayout = document.querySelector('.layout-card-option.active');
+        if (activeLayout) activeLayout.style.borderColor = this.value;
+      });
     }
-
-    document.addEventListener("DOMContentLoaded", function() {
-      const colorInput = document.getElementById("id_theme_color");
-      const preview = document.getElementById("customColorCircle");
-      const customPill = document.querySelector(".custom-color-trigger-pill");
-
-      if (colorInput) {
-        colorInput.addEventListener("input", function() {
-          document.querySelectorAll(".preset-color-badge").forEach(b => b.classList.remove("active"));
-          if (customPill) customPill.classList.add("active");
-          if (preview) preview.style.backgroundColor = this.value;
-        });
-      }
-    });
+  });
   </script>
   {% endif %}
 

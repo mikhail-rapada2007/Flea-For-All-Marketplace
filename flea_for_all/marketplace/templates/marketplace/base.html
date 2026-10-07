@@ -40,14 +40,7 @@
             </li>
             {% if user.is_authenticated and user.profile %}
               <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'store_detail' %}active{% endif %}" 
-                  href="{% url 'marketplace:store_detail' user.profile.pk %}">MY STORE</a>
-              </li>
-            {% endif %}
-            {% if user.is_authenticated %}
-              <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}" 
-                   href="{% url 'marketplace:inbox' %}">MESSAGES</a>
+                <a href="{% url 'marketplace:store_detail' user.profile.pk %}" class="nav-link {% if profile and user == profile.user %}active{% endif %}">MY STORE</a>
               </li>
             {% endif %}
           </ul>

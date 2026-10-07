@@ -278,6 +278,35 @@ body {
   transform: rotate(90deg) scale(1.15);
 }
 
+/* Hero Action Buttons */
+.btn-hero-message {
+  background-color: #ffffff !important;
+  color: var(--card-brown) !important;
+  border: 1px solid #ffffff !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-message:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--card-brown) !important;
+  transform: translateY(-1px);
+}
+
+/* Red Report Button */
+.btn-hero-report {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-report:hover {
+  background-color: #bb2d3b !important;
+  border-color: #b02a37 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
 /* ==========================================================================
    6. Authentication & Django Form Elements
    ========================================================================== */
