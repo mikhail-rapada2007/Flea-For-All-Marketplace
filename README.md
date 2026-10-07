@@ -46,9 +46,13 @@ Duplicate the `.env.example` and rename it as a new file named `.env` in the pro
 
 Open `.env` and fill in the values:
 `EMAIL_HOST_USER = email_here`
+
 `EMAIL_HOST_PASSWORD = password_here`
+
 `SECRET_KEY = secret_key_here`
+
 `DEBUG = True`
+
 `ALLOWED_HOSTS = 127.0.0.1, localhost`
 
 To generate a SECRET_KEY, run:
