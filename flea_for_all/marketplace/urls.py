@@ -31,4 +31,9 @@ urlpatterns = [
     path("verify-email/<uidb64>/<token>/", views.verify_email, name="verify_email"),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
+    path('profile/<int:profile_id>/clear-image/<str:image_type>/', views.clear_profile_image, name='clear_profile_image'),
+    path('user/<int:user_id>/delete/', views.delete_user, name='delete_user'),
+    path('product/<int:product_id>/clear-image/', views.clear_product_image, name='clear_product_image'),
+    path('product/<int:product_id>/edit/', views.edit_product, name='edit_product'),
+    path('report/<str:report_type>/<int:report_id>/resolve/', views.mark_report_resolved, name='mark_report_resolved'),
     ]

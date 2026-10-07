@@ -63,7 +63,7 @@ class ProductForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'condition': forms.Select(attrs={'class': 'form-select'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 class ProfileForm(forms.ModelForm):
@@ -85,8 +85,8 @@ class ProfileForm(forms.ModelForm):
             'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'}),
             'province': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Province'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Tell buyers about your store...'}),
-            'profile_picture': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'theme_background': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+            'theme_background': forms.FileInput(attrs={'class': 'form-control'}),
             'theme_color': forms.TextInput(attrs={'class': 'form-control', 'type': 'color', 'style': 'height: 42px; padding: 4px;'}),
             'theme_font': forms.Select(attrs={'class': 'form-select'}),
         }
