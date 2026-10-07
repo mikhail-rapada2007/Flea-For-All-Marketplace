@@ -107,13 +107,14 @@ Visit `http://127.0.0.1:8000/` in your browser. Admin panel is available at `htt
 ## Known Limitations
 
 - Uploaded images are stored locally only; cloud-based image storage is not implemented
+- 
 
 ## Team
 
 | Member | Role |
 |---|---|
-| Mikhail Rapada | Models, Authentication, Admin Panel, Detailed Item View, Report System |
+| Mikhail Rapada | Initial Models, Authentication, Email Verification, Detailed Item View, Report System, Admin Dashboard |
 | Brix Palac | Store Listings, Store Profile View, Store FAQ, Chat Feature |
-| Jemimah Salucop | Terms and Services, Store Review, Category Search |
-| Prince Ubando | Product Listings, Sell Item Function, CSS Design |
-| Andrew Bagaporo | Product Status Control, Report System |
+| Jemimah Salucop | Terms and Services, Store Review, Category Search, General Search |
+| Prince Ubando | Product Listings, Store Customizability, Sell Item Function, CSS Design, Chat Feature |
+| Andrew Bagaporo | Product Status Control, Report System, Bug Fixes |
