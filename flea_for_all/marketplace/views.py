@@ -10,6 +10,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.http import Http404
 
 
 def home(request):
@@ -208,10 +209,18 @@ def product_detail(request, pk):
     return render(request, "marketplace/product_detail.html", {"product": product})
 
 def category_detail(request, category_slug):
-    products = Product.objects.all()
+
+    category_value = category_slug.upper()
+
+    valid_categories = dict(Product.Category.choices)
+    if category_value not in valid_categories:
+        raise Http404("Category not found")
+
+    products = Product.objects.filter(category=category_value)
+
     return render(request, "marketplace/category_detail.html", {
         "products": products,
-        "selected_category": category_slug,
+        "selected_category": valid_categories[category_value],
         "categories": Product.Category.choices,
     })
 
