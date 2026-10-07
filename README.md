@@ -45,6 +45,7 @@ python -m pip install -r requirements.txt
 Duplicate the `.env.example` and rename it as a new file named `.env` in the project root.
 
 Open `.env` and fill in the values:
+
 `EMAIL_HOST_USER = email_here`
 
 `EMAIL_HOST_PASSWORD = password_here`
