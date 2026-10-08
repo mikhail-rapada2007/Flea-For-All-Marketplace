@@ -622,8 +622,8 @@
         {% for review in reviews %}
           <div class="market-card p-3 mb-3">
             <div class="text-warning">{% for i in ""|center:review.score %}★{% endfor %} ({{ review.score }}/5)</div>
-            <div class="text-white-50 mt-1">{{ review.comment }}</div>
-            <div class="text-white-50 small mt-2">By: {{ review.rated_by.username }}</div>
+            <div class="text-black-50 mt-1">{{ review.comment }}</div>
+            <div class="text-black-50 small mt-2">By: {{ review.rated_by.username }}</div>
           </div>
         {% empty %}
           <p class="text-muted">No reviews yet.</p>
