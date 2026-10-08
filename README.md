@@ -114,6 +114,8 @@ Visit `http://127.0.0.1:8000/` in your browser. Admin panel is available at `htt
 ## Known Limitations
 
 - Uploaded images are stored locally only; cloud-based image storage is not implemented
+- Chat is not realtime
+- Rapidly clicking publish listing leads to duplicate listings
 
 ## Team
 
