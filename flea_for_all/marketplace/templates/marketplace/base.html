@@ -24,7 +24,10 @@
   <header class="bg-market-brown py-3">
     <div class="container-xl">
       <nav class="navbar navbar-expand-md navbar-dark p-0">
-        <a class="navbar-brand brand-logo text-white m-0" href="{% url 'marketplace:home' %}">Flee For All</a>
+        <a class="navbar-brand brand-logo text-white m-0" href="{% url 'marketplace:home' %}">
+          <img src="{% static 'images/LOGO.png' %}" alt="" aria-hidden="true">
+          <span>Flea For All</span>
+        </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
           <span class="navbar-toggler-icon"></span>
