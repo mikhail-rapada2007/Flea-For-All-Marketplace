@@ -99,7 +99,6 @@ Visit `http://127.0.0.1:8000/` in your browser. Admin panel is available at `htt
 - Uploadable Pictures for the profile picture, store banner, and items to be sold. 
 - Store FAQ (sellers can add their own frequently asked questions)
 - Store reviews with separate buyer and seller ratings
-- Verified store badge
 
 ### Messaging
 - Persistent chat between buyers and sellers, accessible as a floating widget across the site
@@ -115,7 +114,6 @@ Visit `http://127.0.0.1:8000/` in your browser. Admin panel is available at `htt
 ## Known Limitations
 
 - Uploaded images are stored locally only; cloud-based image storage is not implemented
-- 
 
 ## Team
 
