@@ -19,6 +19,7 @@ from django.urls import include, path, re_path
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.views.static import serve
+from pathlib import Path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,7 +33,7 @@ if settings.DEBUG:
         re_path(
             r"^media/products/(?P<path>.*)$",
             serve,
-            {"document_root": settings.MEDIA_ROOT / "products"},
+            {"document_root": Path(settings.MEDIA_ROOT) / "products"},
         ),
         re_path(
             r"^media/profiles/(?P<path>.*)$",
