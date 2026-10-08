@@ -2,6 +2,8 @@
 A peer-to-peer marketplace web application built with Django, inspired by platforms like Facebook Marketplace. Developed for Object-Oriented Programming (CPE 201), Holy Angel University, Group 2, SY 2026-2027.
 This is the official output of Group 2 of CPE-201, 2026-2027. 
 
+Live Website Link: https://fleaforall.pythonanywhere.com/
+
 ## Tech Stack
 - **Backend:** Python 3.9.13, Django 4.2.30
 - **Frontend:** HTML 5, Bootstrap 5
